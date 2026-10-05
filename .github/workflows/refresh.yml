@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
 concurrency:
   group: refresh
   cancel-in-progress: false
@@ -21,7 +22,8 @@ jobs:
           node-version: 22
       - name: Download the stats and rebuild
         run: bash build/refresh.sh
-      - name: Publish if anything changed
+      - name: Save the new version
+        id: save
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -31,4 +33,11 @@ jobs:
           else
             git commit -m "Weekly stats refresh"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+      # A commit made by this job does not make GitHub Pages republish on its own, so ask for it.
+      - name: Publish the site
+        if: steps.save.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
