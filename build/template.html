@@ -1,0 +1,929 @@
+<title>__NAME__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&family=Onest:wght@400;500;600&display=swap">
+<style>
+/* Layout: the rink is the whole screen. It stands on end on tall screens so the puck travels up ice,
+   and lies flat on wide ones. The prompt, clock and result float over the ice as glass panels. */
+:root{
+  color-scheme:dark;
+  --bg:#05080D; --glass:rgba(6,11,17,.8); --edge:#27394A; --text:#EAF2F8; --dim:#8E9EAD; --faint:#55667A;
+  --cyan:#7BD3FF; --blue:#4A86F0; --red:#FF3D55; --gold:#FFC857;
+  --display:"Barlow Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;
+  --body:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg)}
+body{margin:0;color:var(--text);font:400 16px/1.5 var(--body)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+:is(button,input):focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:4px}
+
+.app{position:relative;height:100%;min-height:540px;overflow:hidden;--top:74px}
+#rink{position:absolute;inset:0;width:100%;height:100%;display:block}
+.app.shake #rink{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{translate:-2px 0}20%,80%{translate:4px 0}30%,50%,70%{translate:-7px 0}40%,60%{translate:7px 0}}
+.flash{position:absolute;inset:0;pointer-events:none;opacity:0;--c:255,61,85;background:radial-gradient(60% 45% at var(--fx,50%) var(--fy,10%),rgba(var(--c),.55),transparent 70%)}
+.flash.gold{--c:255,200,87}
+.flash.go{animation:flash 1.5s ease-out}
+@keyframes flash{0%{opacity:0}8%{opacity:1}30%{opacity:.35}45%{opacity:.9}100%{opacity:0}}
+
+.top{position:absolute;inset:0 0 auto 0;z-index:5;padding:12px 16px 14px;background:linear-gradient(var(--bg) 50%,rgba(5,8,13,0))}
+.topin{max-width:900px;margin-inline:auto;display:flex;flex-direction:column;gap:9px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar > *{min-width:0}
+.brand{font:italic 800 1.3rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--text);box-shadow:0 0 14px 2px rgba(123,211,255,.7);display:inline-block;flex:none}
+.tot{font:italic 800 1.75rem/1 var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot small{font-size:.5em;color:var(--dim);font-weight:700;margin-left:5px;letter-spacing:.08em}
+.pips{list-style:none;margin:0;padding:0;display:flex;gap:6px;flex:1;max-width:240px}
+.pips li{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12);transition:background .5s,box-shadow .5s}
+.pips li.now{background:rgba(255,255,255,.4)}
+.pips li.t1{background:var(--faint)} .pips li.t2{background:var(--blue)} .pips li.t3{background:var(--cyan)}
+.pips li.t4{background:var(--text)} .pips li.t5{background:var(--red);box-shadow:0 0 10px rgba(255,61,85,.8)}
+.pips li.t6{background:var(--gold);box-shadow:0 0 10px rgba(255,200,87,.8)} .pips li.t0{background:#2A3440}
+.modes{display:flex;gap:3px;background:rgba(255,255,255,.07);padding:3px;border-radius:999px;flex:none}
+.modes button{white-space:nowrap;font-weight:600;font-size:.78rem;padding:5px 10px;border-radius:999px;color:var(--dim);transition:background .25s,color .25s}
+.modes button.on{background:var(--text);color:var(--bg)}
+
+.readout{position:absolute;left:0;top:0;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:2px;--tc:var(--text);will-change:transform;text-shadow:0 2px 18px rgba(0,0,0,.75)}
+.readout .line{font:italic 800 clamp(3rem,13vw,5.2rem)/.8 var(--display);font-variant-numeric:tabular-nums;color:var(--tc);display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.readout .u{font-size:.28em;color:var(--dim);letter-spacing:.06em;font-weight:700}
+.readout .z{font:italic 700 .95rem/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--tc);white-space:nowrap;opacity:.9}
+.t1{--tc:var(--dim)} .t2{--tc:var(--blue)} .t3{--tc:var(--cyan)} .t4{--tc:var(--text)} .t5{--tc:var(--red)} .t6{--tc:var(--gold)} .t0{--tc:var(--faint)}
+
+.card{position:absolute;left:50%;translate:-50% 0;z-index:4;width:min(calc(100% - 24px),520px);padding:18px 18px 20px;display:flex;flex-direction:column;gap:11px;
+  background:var(--glass);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);border:1px solid rgba(255,255,255,.09);border-radius:18px;
+  box-shadow:0 18px 60px rgba(0,0,0,.5);transition:opacity .25s}
+.card.hide{opacity:0;pointer-events:none}
+.card.pos-upper{top:calc(var(--top) + 4%)}
+.card.pos-center{top:50%;translate:-50% -50%}
+.card.pos-bottom{bottom:14px;overflow-y:auto}
+.card.pos-fill{top:calc(var(--top) + 4px);bottom:12px;overflow-y:auto;width:min(calc(100% - 24px),560px)}
+.card.buzz{animation:shake .45s cubic-bezier(.36,.07,.19,.97)}
+.card > *{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.card > *:nth-child(2){animation-delay:.05s}.card > *:nth-child(3){animation-delay:.1s}.card > *:nth-child(4){animation-delay:.15s}
+.card > *:nth-child(5){animation-delay:.2s}.card > *:nth-child(6){animation-delay:.25s}.card > *:nth-child(7){animation-delay:.3s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.eyebrow{margin:0;font-size:.72rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--dim)}
+h2{margin:0;font:600 clamp(1.65rem,6.6vw,2.2rem)/1.04 var(--display);letter-spacing:.005em;text-wrap:balance}
+.note{margin:0;color:var(--dim);font-size:.9rem}
+.small{margin:0;color:var(--faint);font-size:.78rem;line-height:1.45}
+
+.clockrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.clock{font:italic 800 2rem/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.02em;color:var(--cyan);min-width:3ch;text-align:right;transition:color .3s}
+.tbar{height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden}
+.tbar b{display:block;height:100%;background:var(--cyan);transform-origin:0 50%;transition:background .3s}
+.warn .clock{color:var(--gold)} .warn .tbar b{background:var(--gold)}
+.crit .clock{color:var(--red);animation:tick .5s ease-in-out infinite} .crit .tbar b{background:var(--red)}
+@keyframes tick{50%{transform:scale(1.14)}}
+form{display:flex;gap:10px;align-items:stretch;margin-top:2px}
+.field{flex:1;min-width:0}
+input[type=text]{width:100%;font:500 1.15rem var(--body);color:var(--text);background:rgba(255,255,255,.06);border:0;border-bottom:2px solid var(--edge);border-radius:8px 8px 0 0;padding:12px 13px;transition:border-color .2s,background .2s}
+input[type=text]:focus{outline:none;border-color:var(--cyan);background:rgba(123,211,255,.09)}
+input::placeholder{color:var(--faint)}
+.field.nope input{animation:nope .35s;border-color:var(--red)}
+@keyframes nope{20%{translate:-6px 0}40%{translate:6px 0}60%{translate:-4px 0}80%{translate:4px 0}}
+.go{font:italic 800 1.2rem/1 var(--display);letter-spacing:.08em;text-transform:uppercase;padding:0 22px;background:var(--cyan);color:#041018;border-radius:8px;transition:transform .15s,box-shadow .2s}
+.go:hover{box-shadow:0 0 22px rgba(123,211,255,.5)} .go:active{transform:scale(.96)}
+.go.wide{padding:12px 18px;font-size:1.1rem}
+.go.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 2px var(--edge)}
+.go.ghost:hover{box-shadow:inset 0 0 0 2px var(--dim)}
+.under{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:24px}
+.fb{margin:0;font-weight:600;color:var(--dim);min-height:1.5em}
+.fb.bad{color:var(--red)}
+.link{color:var(--dim);font-size:.9rem;font-weight:500;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--faint)}
+.link:hover{color:var(--text)}
+
+.who{font:italic 800 clamp(2rem,9vw,3rem)/.92 var(--display);text-transform:uppercase;letter-spacing:.005em;margin:0;overflow-wrap:anywhere}
+.badge{display:inline-flex;align-items:center;gap:9px;font:italic 700 1rem/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--tc,var(--dim));align-self:flex-start}
+.badge svg{display:block}
+.rare{margin:0}
+.rare b{color:var(--tc,var(--text));font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+.sheet{position:absolute;z-index:6;left:50%;translate:-50% 0;top:calc(var(--top) + 4px);bottom:12px;width:min(calc(100% - 24px),520px);display:flex;flex-direction:column;
+  background:rgba(6,11,17,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.6);animation:rise .3s cubic-bezier(.2,.8,.2,1) both}
+.sheethead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 12px 10px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.x{width:36px;height:36px;border-radius:50%;font:600 1.5rem/1 var(--display);color:var(--dim)}
+.x:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.all{list-style:none;margin:0;padding:0;font-size:.93rem}
+.all li{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 6px;border-radius:5px}
+.all li i{width:8px;height:8px;border-radius:50%;background:var(--tc)}
+.all li span:last-child{color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.85rem}
+.all li.me{background:rgba(123,211,255,.14);font-weight:600}
+
+.final{font:italic 800 clamp(3.8rem,19vw,6rem)/.82 var(--display);font-variant-numeric:tabular-nums;margin:0;display:flex;align-items:baseline;gap:8px}
+.final .u{font-size:.24em;color:var(--dim);font-weight:700;letter-spacing:.06em}
+.bars{list-style:none;margin:2px 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.bars li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:baseline}
+.bars .lab{font-size:.78rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars .ans{font-weight:600;font-size:.95rem;overflow-wrap:anywhere}
+.bars .ft{font:italic 700 1.15rem/1 var(--display);font-variant-numeric:tabular-nums;color:var(--tc);grid-row:1/3;grid-column:2;align-self:center}
+.bars .track{grid-column:1/3;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.bars .track b{display:block;height:100%;border-radius:2px;background:var(--tc);width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0;padding:12px 0;border-block:1px solid rgba(255,255,255,.09)}
+.stats div{min-width:0}
+.stats dt{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.stats dd{margin:0;font:italic 700 1.5rem/1.1 var(--display);font-variant-numeric:tabular-nums}
+
+.snd{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--dim);flex:none}
+.snd:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.snd svg{display:block}
+.right{display:flex;align-items:center;gap:8px}
+.tcbox{margin:0;padding:7px 11px;border-radius:10px;background:rgba(255,200,87,.1);border:1px solid rgba(255,200,87,.35);font-size:.9rem;display:flex;gap:10px;align-items:baseline}
+.tcbox b{font:italic 800 .95rem/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.all li em{font-style:normal;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-left:6px;white-space:nowrap}
+.sheetbody{overflow-y:auto;flex:1;padding:10px 14px 16px;display:flex;flex-direction:column;gap:12px}
+.sheetbody .all{padding:0;overflow:visible}
+.packs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.packs button{width:100%;text-align:left;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:baseline;transition:background .2s,border-color .2s}
+.packs button:hover{background:rgba(123,211,255,.1);border-color:rgba(123,211,255,.4)}
+.packs .pn{font:italic 800 1.35rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.packs .pc{color:var(--dim);font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.packs .pb{grid-column:1/3;color:var(--dim);font-size:.88rem}
+.credits{margin:0;color:var(--dim);font-size:.85rem;line-height:1.5}
+.finrow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px 18px}
+.finrow h2{font-size:clamp(1.3rem,5.4vw,1.7rem);padding-bottom:4px}
+.card .final{font-size:clamp(3rem,14vw,4.2rem)}
+.under .link{white-space:nowrap}
+
+.right{gap:4px}
+.tot{margin-left:6px}
+.links{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:flex-end}
+.chips{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.chips b{font:italic 700 .9rem/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.chips span{font:italic 700 .95rem/1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:6px;background:rgba(255,200,87,.14);border:1px solid rgba(255,200,87,.4);color:var(--gold)}
+.post{margin:0}
+.post input{font-size:1rem;padding:10px 12px}
+.sheetbody section{display:flex;flex-direction:column;gap:8px}
+.stats.wrap{grid-template-columns:repeat(3,1fr);row-gap:12px}
+.sheetbody .stats{padding:10px 0;border-block:0;border-top:1px solid rgba(255,255,255,.09)}
+.lb{list-style:none;margin:0;padding:0;font-size:.95rem}
+.lb li{display:grid;grid-template-columns:2ch minmax(0,1fr) auto auto;gap:10px;align-items:baseline;padding:6px 6px;border-top:1px solid rgba(255,255,255,.07);border-radius:4px}
+.lb .rk{color:var(--dim);font-variant-numeric:tabular-nums;text-align:right}
+.lb .nm{font-weight:600;overflow-wrap:anywhere}
+.lb .gl{color:var(--dim);font-size:.82rem;white-space:nowrap}
+.lb .ft{font:italic 700 1.1rem/1 var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lb li.me{background:rgba(123,211,255,.14)}
+.cal{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal li{aspect-ratio:1/0.82;border-radius:6px;background:rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:.7rem;color:var(--faint);min-width:0}
+.cal li.h{aspect-ratio:auto;background:none;font-weight:600;color:var(--dim);padding-bottom:2px}
+.cal li b{font-weight:500}
+.cal li span{font:italic 700 .82rem/1 var(--display);font-variant-numeric:tabular-nums;color:var(--tc)}
+.cal li.on{background:rgba(255,255,255,.08);color:var(--dim);box-shadow:inset 0 -3px 0 var(--tc)}
+.cal li.now{outline:1.5px solid var(--cyan);outline-offset:-1.5px;color:var(--text)}
+.cal li.later{opacity:.35}
+.achs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.achs li{padding:9px 11px;border-radius:10px;border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:2px;color:var(--faint)}
+.achs li b{font:italic 700 1.05rem/1 var(--display);letter-spacing:.06em;text-transform:uppercase}
+.achs li span{font-size:.82rem}
+.achs li.got{border-color:rgba(255,200,87,.45);background:rgba(255,200,87,.08);color:var(--dim)}
+.achs li.got b{color:var(--gold)}
+.shot{display:block;width:100%;height:auto;border-radius:10px;border:1px solid rgba(255,255,255,.1)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:12px;background:rgba(255,255,255,.05)}
+.tabs button{padding:9px 8px;border-radius:9px;font:italic 800 1.1rem/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);transition:background .2s,color .2s}
+.tabs button[aria-selected="true"]{background:var(--cyan);color:#041018}
+.teams{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:6px}
+.teams button{width:100%;text-align:left;padding:10px 7px 10px 11px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--tc);display:flex;align-items:baseline;gap:6px;min-width:0;transition:background .2s,border-color .2s}
+.teams button:hover{background:rgba(123,211,255,.1);border-color:rgba(123,211,255,.4);border-left-color:var(--tc)}
+.teams b{font:italic 800 1.3rem/1 var(--display);letter-spacing:.04em;flex:none;min-width:1.8em}
+.teams span{color:var(--dim);font-size:.8rem;letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (max-width:359px){.teams{grid-template-columns:1fr 1fr}.teams button{flex-direction:column;align-items:flex-start;gap:2px;padding-block:8px}}
+.how{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.how > li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start}
+.how > li > b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:italic 800 1.15rem/1 var(--display);background:rgba(123,211,255,.14);color:var(--cyan)}
+.how h3{margin:3px 0 3px;font:600 1.3rem/1.1 var(--display);letter-spacing:.01em}
+.how p{margin:0;color:var(--dim);font-size:.9rem}
+.how .bars{margin:10px 0 0}
+.how .bars .track b{transition:none}
+.vs{margin:0;padding:7px 11px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);font-weight:600;font-size:.95rem}
+.vs.w{background:rgba(255,200,87,.1);border-color:rgba(255,200,87,.4);color:var(--gold)}
+.sheetbody .post{display:flex;gap:8px}
+.sheetbody .post input{flex:1;min-width:0}
+@media (prefers-reduced-motion: reduce){
+  .card > *,.flash.go,.app.shake #rink,.field.nope input,.card.buzz,.crit .clock,.sheet{animation:none}
+  .bars .track b{transition:none}
+}
+</style>
+
+<div class="app" id="app">
+  <canvas id="rink" role="img" aria-label="A hockey rink filling the screen. The puck travels from your goal line toward the far net; the rarer the answer, the further it goes."></canvas>
+  <div class="flash" id="flash"></div>
+  <header class="top" id="top"><div class="topin">
+    <div class="bar">
+      <div class="brand"><i></i>__NAME__</div>
+      <div class="right"><button class="snd" type="button" id="rec" aria-label="Records and leaderboard"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/><path d="M12 14v4"/><path d="M8 20h8"/></svg></button><button class="snd" type="button" id="snd" aria-label="Sound on" aria-pressed="true"></button>
+      <div class="tot" aria-label="Total feet"><span id="total">0</span><small>FT</small></div></div>
+    </div>
+    <div class="bar">
+      <ol class="pips" id="pips" aria-label="Progress through seven prompts"></ol>
+      <nav class="modes" aria-label="Game mode">
+        <button type="button" id="m-daily">Daily</button>
+        <button type="button" id="m-free">Free skate</button>
+        <button type="button" id="m-pack">Packs</button>
+      </nav>
+    </div>
+  </div></header>
+  <div class="readout" id="readout" hidden><span class="line"><span id="feet">0</span><span class="u">FT</span></span><span class="z" id="zone"></span></div>
+  <section class="card" id="card" aria-label="Game"></section>
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheethead"><p class="eyebrow" id="sheett"></p><button class="x" type="button" id="sheetx" aria-label="Close">×</button></div>
+    <div class="sheetbody" id="sheetbody"></div>
+  </div>
+</div>
+
+<script id="data" type="application/json">/*DATA*/</script>
+<script>
+/* ================= data ================= */
+const DATA=JSON.parse(document.getElementById("data").textContent);
+const NAMES=DATA.names.split("|"), PROMPTS=DATA.prompts;
+const TEAMS=DATA.teams||[], TEAM={}; TEAMS.forEach(t=>TEAM["t-"+t[0]]=t);        // every current team has its own pack, "t-TOR" and so on
+const GOAL_LINE=189, N_PROMPTS=7, LIMIT=30000;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>Number(n).toLocaleString("en-CA");
+const season=Y=>`${Y}–${String((Y+1)%100).padStart(2,"0")}`;
+const REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ================= scoring ================= */
+function setOf(pi){
+  const p=PROMPTS[pi]; if(p._s) return p._s;
+  const n=p.a.length/p.k, ans=[];
+  for(let i=0;i<n;i++){ const o=i*p.k; ans.push({bi:i,ni:p.a[o],name:NAMES[p.a[o]],vals:p.a.slice(o+1,o+p.k),tc:!!(p.c&&p.c.includes(i)),said:0}); }
+  const set=p._s={p,ans,n,total:0}; rankSet(set,null); return set;
+}
+/* Rank a list from most to least obvious. With no player data this is the formula's order (the order the list ships in).
+   As real guesses come in, the order leans toward what players actually say: half weight at 40 guesses on a prompt. */
+function rankSet(set,counts){
+  const n=set.n, K=40; let N=0; set.ans.forEach(a=>{ a.said=(counts&&counts[a.name])||0; N+=a.said; }); set.total=N;
+  const lam=N/(N+K), cr=new Map(set.ans.slice().sort((x,y)=>y.said-x.said||x.bi-y.bi).map((a,i)=>[a,i]));
+  const key=a=>(1-lam)*a.bi+lam*cr.get(a);
+  set.sorted=set.ans.slice().sort((x,y)=>key(x)-key(y)||x.bi-y.bi);
+  set.sorted.forEach((a,r)=>{ a.rank=r; a.pct=n>1?r/(n-1):0; a.feet=Math.round(11+189*a.pct); });
+}
+function tierOf(feet,pct){
+  if(feet<=0) return {t:0,name:"Turnover"};
+  if(pct>=0.99) return {t:6,name:"Bar down"};
+  if(feet>=GOAL_LINE) return {t:5,name:"Goal"};
+  if(feet>=165) return {t:4,name:"In the slot"};
+  if(feet>125) return {t:3,name:"Zone entry"};
+  if(feet>=75) return {t:2,name:"Neutral zone"};
+  return {t:1,name:"Own zone"};
+}
+function detail(p,a){
+  const t=p.t, v=a.vals, ht=h=>`${Math.floor(h/12)}'${h%12}"`;
+  switch(t[0]){
+    case "c": return `${fmt(v[0])} ${t[1]}`;
+    case "s": return `${fmt(v[0])} ${t[1]} in ${season(v[1])}`+(v[2]>1?` · ${v[2]} seasons like it`:"");
+    case "sp": return `${v[0]} ${t[1]} in the ${v[1]} playoffs`+(v[2]>1?` · ${v[2]} runs like it`:"");
+    case "r": return `${v[0]} GP · ${v[1]} ${v[2]?"wins":"pts"}`;
+    case "rp": return `${v[0]} playoff GP · ${v[1]} ${v[2]?"wins":"pts"}`;
+    case "y": return `NHL career ${v[0]}–${v[1]}`;
+    case "d": return `No. ${v[0]} overall`;
+    case "dy": return `No. ${v[0]} overall, ${v[1]}`;
+    case "l": return v[0]>1?`${v[0]} times, last in ${season(v[1])}`:`In ${season(v[1])}`;
+    case "h": return ht(v[0]);
+    case "a": return `Age ${v[0]} in ${season(v[1])}`;
+    case "pg": return `${(v[0]/100).toFixed(2)} points per game`;
+    case "x": return t[1][v[0]]||"";
+  }
+  return "";
+}
+function rating(total){
+  if(total>=1200) return "Coast to coast";
+  if(total>=950) return "End-to-end rush";
+  if(total>=650) return "Clean zone entry";
+  if(total>=350) return "Dump and chase";
+  return "Pinned in your own end";
+}
+
+/* ================= name matching ================= */
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[.'’`]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+const CANON={};
+("alex alexander alexandre aleksander aleksandr|mike michael mikey micheal|matt matthew mathew matty mat|nick nicklas nicholas nicolas niklas nik nicky|steve steven stephen stevie|"+
+ "pat patrick patrik patric|dan danny daniel|dave david davey|bob bobby robert rob robbie|bill billy william will willie willy|jim jimmy james|joe joseph joey|tom tommy thomas tomas|"+
+ "tony anthony|chris christopher kris kristopher|jon jonathan john johnny jonny jonathon|zach zack zachary zac|josh joshua|sam samuel sammy|ben benjamin|max maxime maxim maksim|"+
+ "andy andrew drew|tim timothy|ken kenny kenneth|ron ronnie ronald|don donald donnie|ed eddie edward eddy|rick ricky richard rich dick|greg gregory gregg|jeff jeffrey geoff geoffrey|"+
+ "brad bradley|doug douglas|phil philip phillip philippe|vince vincent vinny vinnie|evgeni evgeny evgenii yevgeni geno|sergei sergey|alexei alexey|andrei andrey|nikolai nikolay|"+
+ "dmitri dmitry dimitri|ted teddy theodore theo|jake jacob jakob|nate nathan|cam cameron|gabe gabriel|marty martin|larry lawrence|gerry jerry gerald|ray raymond|al allan alan allen|"+
+ "fred freddie freddy frederik frederick fredrik|charlie charles chuck|pete peter petr|stan stanley|vic victor viktor|erik eric|mark marc|brian bryan|sean shawn shaun|mitch mitchell|"+
+ "gord gordie gordon|dom dominik dominic|wes wesley|lou louis|dave davie").split("|").forEach(g=>{const w=g.split(" "); w.forEach(x=>CANON[x]=w[0]);});
+const canon=k=>{const t=k.split(" "); if(CANON[t[0]]) t[0]=CANON[t[0]]; return t.join(" ");};
+const NICKS={"ovi":"Alex Ovechkin","ovie":"Alex Ovechkin","sid":"Sidney Crosby","sid the kid":"Sidney Crosby","cujo":"Curtis Joseph","rnh":"Ryan Nugent-Hopkins","the great one":"Wayne Gretzky",
+ "super mario":"Mario Lemieux","mcjesus":"Connor McDavid","geno":"Evgeni Malkin","flower":"Marc-Andre Fleury","stammer":"Steven Stamkos","rocket richard":"Maurice Richard","the rocket":"Maurice Richard",
+ "boom boom geoffrion":"Bernie Geoffrion","js giguere":"Jean-Sebastien Giguere","teeder kennedy":"Ted Kennedy","mr hockey":"Gordie Howe","jumbo joe":"Joe Thornton","bob":"Sergei Bobrovsky",
+ "king henrik":"Henrik Lundqvist","the dominator":"Dominik Hasek","stevie y":"Steve Yzerman","mo seider":"Moritz Seider","nuge":"Ryan Nugent-Hopkins"};
+function lev(a,b){ const m=a.length,n=b.length; let prev=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; } return prev[n]; }
+/* index: full-name keys and partial (surname) keys -> list of entries */
+function buildIndex(entries){ // entries: [{name, ref}]
+  const full=new Map(), part=new Map();
+  const put=(m,k,ref)=>{ if(!k) return; const a=m.get(k); if(a){ if(!a.includes(ref)) a.push(ref); } else m.set(k,[ref]); };
+  for(const e of entries){ const f=norm(e.name), t=f.split(" ");
+    put(full,f,e.ref); put(full,canon(f),e.ref);
+    if(t.length>1){ put(part,t[t.length-1],e.ref); if(t.length>2) put(part,t.slice(1).join(" "),e.ref); } }
+  return {full,part};
+}
+let GLOBAL=null, NICKREF=null;
+function globalIndex(){ if(!GLOBAL){ GLOBAL=buildIndex(NAMES.map((name,i)=>({name,ref:i}))); NICKREF={}; for(const k in NICKS){ const r=GLOBAL.full.get(norm(NICKS[k])); if(r) NICKREF[k]=r[0]; } } return GLOBAL; }
+function fuzzy(map,g,minLen){ let best=9,who=[];
+  for(const [k,refs] of map){ if(k.length<minLen) continue; const thr=k.length<=5?0:k.length<=9?1:2; if(!thr||Math.abs(k.length-g.length)>thr) continue;
+    const d=lev(g,k); if(d>thr) continue; if(d<best){best=d;who=refs.slice();} else if(d===best){ for(const r of refs) if(!who.includes(r)) who.push(r); } }
+  return who; }
+/* judge a guess against one prompt.
+   -> {type:"hit",i} | {type:"ambiguous"} | {type:"wrong",name} | {type:"unknown"} | {type:"empty"} */
+function judge(text,set){
+  const g0=norm(text); if(!g0) return {type:"empty"};
+  const G=globalIndex();
+  if(!set.index){ set.index=buildIndex(set.ans.map((a,i)=>({name:a.name,ref:i}))); set.byNi=new Map(set.ans.map((a,i)=>[a.ni,i])); }
+  const nick=NICKREF[g0];
+  if(nick!=null) return set.byNi.has(nick)?{type:"hit",i:set.byNi.get(nick)}:{type:"wrong",name:NAMES[nick]};
+  const g=canon(g0), S=set.index;
+  let r=S.full.get(g0)||S.full.get(g);
+  if(r) return {type:"hit",i:Math.min(...r)};
+  r=S.part.get(g0);
+  if(r) return r.length===1?{type:"hit",i:r[0]}:{type:"ambiguous"};
+  let gr=G.full.get(g0)||G.full.get(g);
+  if(gr) return {type:"wrong",name:NAMES[gr[0]]};
+  if(g0.length>=5){
+    let f=fuzzy(S.full,g,6); if(!f.length) f=fuzzy(S.full,g0,6);
+    if(!f.length){ const pf=fuzzy(S.part,g0,6); if(pf.length===1) f=pf; else if(pf.length>1) return {type:"ambiguous"}; }
+    if(f.length===1) return {type:"hit",i:f[0]};
+    if(f.length>1) return {type:"ambiguous"};
+  }
+  if(G.part.get(g0)) return {type:"wrong",name:text.trim()};
+  if(g0.length>=6){ const f=fuzzy(G.full,g,6); if(f.length) return {type:"wrong",name:NAMES[f[0]]}; const pf=fuzzy(G.part,g0,6); if(pf.length) return {type:"wrong",name:text.trim()}; }
+  return {type:"unknown"};
+}
+
+/* ================= picking prompts ================= */
+function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function hash(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+const FAM={}; PROMPTS.forEach((p,i)=>{ if(p.m) (FAM[p.f]=FAM[p.f]||[]).push(i); });
+const SLOTS=[["M","A"],["S"],["T"],["R"],["B"],["D","N"],["M","S","A","N","D","T"]];
+const PACKS=[["rk","Rookie mode","Easier prompts full of household names, with 45 seconds on the clock."],["mod","Modern NHL","2020–21 to now: current rosters, recent Cup winners, drafts and big seasons."],
+  ["o6","Original Six","Bruins, Blackhawks, Red Wings, Canadiens, Rangers and Leafs."],["90s","The 90s","Draft classes, Cup winners and big seasons from the decade."],
+  ["g","Goalies","Wins, shutouts and crease trivia."],["pim","Enforcers","Penalty minutes and the players who piled them up."],
+  ["po","Playoffs","Cup-winning rosters, long runs and overtime heroes."],["dr","Draft day","First rounds, top picks, steals and busts."]];
+/* a colour per team for the Teams menu, nudged where the real one is too dark to see on the ice */
+const TEAMCOL={ANA:"#F47A38",BOS:"#FFB81C",BUF:"#3C7DE0",CGY:"#E0263D",CAR:"#E03A3E",CHI:"#E03A4E",COL:"#A8415F",CBJ:"#4C77C9",DAL:"#17A35E",DET:"#E03A3E",EDM:"#FF6A1F",FLA:"#D9A441",LAK:"#B4BBBE",MIN:"#2E9E66",MTL:"#D0343F",NSH:"#FFC233",
+  NJD:"#E03A3E",NYI:"#F58A3C",NYR:"#3F74E0",OTT:"#D9A441",PHI:"#F7631F",PIT:"#FCB514",SJS:"#12A5AE",SEA:"#99D9D9",STL:"#3B74D6",TBL:"#3D7BE0",TOR:"#3F7BD8",UTA:"#6CACE4",VAN:"#22A565",VGK:"#C2A76B",WSH:"#E0263D",WPG:"#6A93C9"};
+const isPack=id=>PACKS.some(p=>p[0]===id)||!!TEAM[id];
+const packPool=id=>PROMPTS.map((p,i)=>i).filter(i=>PROMPTS[i].p&&PROMPTS[i].p.includes(id));
+const packName=id=>TEAM[id]?TEAM[id][1]:(PACKS.find(p=>p[0]===id)||[,"Pack"])[1];
+function pick(seed){
+  const r=rng(seed), out=[];
+  const rest=SLOTS.slice(1); for(let i=rest.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [rest[i],rest[j]]=[rest[j],rest[i]]; }
+  for(const slot of [SLOTS[0],...rest]){ const pool=[]; slot.forEach(f=>pool.push(...(FAM[f]||[])));
+    let c,guard=0; do{ c=pool[Math.floor(r()*pool.length)]; }while((out.includes(c)||out.some(o=>PROMPTS[o].g===PROMPTS[c].g))&&++guard<60); out.push(c); }
+  return out;
+}
+function pickPack(seed,id){
+  const r=rng(seed), pool=packPool(id), out=[]; for(let i=pool.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const count=(k,v)=>out.filter(o=>PROMPTS[o][k]===v).length;
+  for(const [gMax,fMax] of [[1,3],[2,5],[9,9]]) for(const c of pool){ if(out.length>=N_PROMPTS) break; if(out.includes(c)) continue; const p=PROMPTS[c]; if(count("g",p.g)<gMax&&count("f",p.f)<fMax) out.push(c); }
+  return out;
+}
+/* the daily ramps up: two easy prompts, three in the middle, two hard ones */
+const EASY=[],MED=[],HARD=[]; PROMPTS.forEach((p,i)=>{ if(p.d===1) EASY.push(i); else if(p.m&&p.d===2) MED.push(i); else if(p.m) HARD.push(i); });
+/* Each slot takes whichever prompt in its pool hashes lowest for that date. Unlike drawing by position, this gives everyone the same seven
+   even after the weekly stats refresh adds or drops prompts elsewhere in the list. */
+const mix=h=>{ h^=h>>>16; h=Math.imul(h,0x85ebca6b); h^=h>>>13; h=Math.imul(h,0xc2b2ae35); h^=h>>>16; return h>>>0; };
+function dailyDraw(day,skip){ const out=[];
+  [EASY,EASY,MED,MED,MED,HARD,HARD].forEach((pool,k)=>{ const order=pool.map(i=>[mix(hash(day+"|"+k+"|"+PROMPTS[i].s)),i]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+    const ok=i=>!out.includes(i)&&!out.some(o=>PROMPTS[o].g===PROMPTS[i].g)&&out.filter(o=>PROMPTS[o].f===PROMPTS[i].f).length<2;
+    out.push((order.find(c=>ok(c[1])&&!(skip&&skip.has(c[1])))||order.find(c=>ok(c[1]))||order.find(c=>!out.includes(c[1])))[1]); });
+  return out; }
+/* ...and it steers clear of what the previous ten days drew, so the daily rarely repeats itself inside a week or two.
+   (Those earlier days are worked out the same way, one level deep, which is as far back as it needs to look.) */
+function pickDaily(day){ const [y,m,d]=day.split("-").map(Number), memo={};
+  const key=n=>{ const t=new Date(y,m-1,d-n); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`; };
+  const raw=n=>memo[n]||(memo[n]=dailyDraw(key(n)));
+  const before=(n,draw)=>{ const s=new Set(); for(let j=1;j<=10;j++) draw(n+j).forEach(i=>s.add(i)); return s; };
+  const played={}, was=n=>played[n]||(played[n]=dailyDraw(key(n),before(n,raw)));
+  return dailyDraw(day,before(0,was)); }
+function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function dayLabel(key){ const [y,m,d]=key.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("en-CA",{month:"short",day:"numeric"}); }
+
+/* ================= state ================= */
+const store={ get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+const KEYS={daily:"c2c6-daily",free:"c2c6-free",pack:"c2c6-pack"}, K_STATS="c2c2-stats", K_MODE="c2c4-mode", K_SEEN="c2c-seen";
+let state, stats=Object.assign({played:0,best:0,goals:0,bars:0,streak:0,maxStreak:0,lastDaily:"",bestBy:{},days:{},ach:{},packs:{}},store.get(K_STATS)||{});
+if(stats.bestBy&&stats.bestBy.tor!=null){ stats.bestBy["t-TOR"]=Math.max(stats.bestBy["t-TOR"]||0,stats.bestBy.tor); delete stats.bestBy.tor; }      // the old Leafs pack is now the Toronto team pack
+if(stats.packs&&stats.packs.tor){ stats.packs["t-TOR"]=1; delete stats.packs.tor; }
+try{ ["c2c5-daily","c2c5-free","c2c5-pack"].forEach(k=>localStorage.removeItem(k)); }catch(e){}
+function fresh(mode,pack){ const key=mode==="daily"?today():String(Math.floor(Math.random()*1e9));
+  return {mode,pack:pack||null,key,picks:mode==="daily"?pickDaily(key):mode==="pack"?pickPack(+key,pack):pick(+key),limit:pack==="rk"?45000:LIMIT,idx:0,view:"intro",askStart:0,results:[],counted:false}; }
+function valid(s,mode){ return s&&s.mode===mode&&Array.isArray(s.picks)&&s.picks.length===N_PROMPTS&&s.picks.every(i=>PROMPTS[i])&&Array.isArray(s.results)&&s.results.length<=N_PROMPTS
+  &&s.idx>=0&&s.idx<N_PROMPTS&&["intro","ask","result","done"].includes(s.view)&&(s.view!=="ask"||s.askStart>0)&&(s.view!=="result"||s.results[s.idx])&&(mode!=="pack"||isPack(s.pack))
+  &&s.results.every((r,k)=>r&&(r.i===-1||setOf(s.picks[k]).ans[r.i])); }
+/* A saved game remembers its prompts and answers by name, so it survives a stats refresh that reshuffles the list underneath it. */
+const PKEY=new Map(PROMPTS.map((p,i)=>[p.s,i]));
+function adopt(s){ if(!s||!Array.isArray(s.pk)||!Array.isArray(s.results)) return null; if(s.v===DATA.v) return s;
+  const picks=s.pk.map(k=>PKEY.get(k)); if(picks.some(i=>i==null)) return null; s.picks=picks;
+  for(let k=0;k<s.results.length;k++){ const r=s.results[k]; if(!r||r.i<0) continue; const j=setOf(picks[k]).ans.findIndex(a=>a.name===r.nm); if(j<0) return null; r.i=j; }
+  s.v=DATA.v; return s; }
+function loadMode(mode){ const s=adopt(store.get(KEYS[mode])); if(valid(s,mode)&&(mode!=="daily"||s.key===today())) return s; return mode==="pack"?null:fresh(mode); }
+function save(){ state.v=DATA.v; state.pk=state.picks.map(i=>PROMPTS[i].s); store.set(KEYS[state.mode],state); store.set(K_MODE,state.mode); }
+const total=()=>state.results.reduce((t,r)=>t+r.feet,0);
+const curSet=()=>setOf(state.picks[state.idx]);
+const limitOf=()=>state.limit||LIMIT;
+const remaining=()=>Math.max(0,limitOf()-(Date.now()-state.askStart));
+function tierFor(k){ const r=state.results[k]; return r?tierOf(r.feet,r.pct||0):null; }
+
+/* ================= online: real guesses and the daily leaderboard (off when no server is configured) ================= */
+const API={url:"__API_URL__",key:"__API_KEY__"}, SITE="__SITE__", NAME="__NAME__";
+const NET=(()=>{
+  const on=()=>/^https:\/\//.test(API.url)&&!!API.key;
+  const call=(path,body)=>{ if(!on()) return Promise.reject("off");
+    const h={apikey:API.key,"Content-Type":"application/json"}; if(API.key.startsWith("eyJ")) h.Authorization="Bearer "+API.key;
+    const ctl=window.AbortController?new AbortController():null, timer=ctl&&setTimeout(()=>ctl.abort(),6000);
+    return fetch(API.url.replace(/\/$/,"")+"/rest/v1/"+path,{method:body?"POST":"GET",headers:h,body:body?JSON.stringify(body):undefined,signal:ctl?ctl.signal:undefined})
+      .then(r=>{ clearTimeout(timer); if(!r.ok) throw r.status; return r.status===204?null:r.text().then(t=>t?JSON.parse(t):null); }); };
+  const device=()=>{ let d=store.get("c2c-device"); if(!d){ d=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():"d"+Math.random().toString(36).slice(2)+Date.now().toString(36); store.set("c2c-device",d); } return d; };
+  return { on,
+    logGuess(prompt,answer){ call("rpc/log_guess",{p_prompt:prompt,p_answer:answer}).catch(()=>{}); },
+    counts(prompts){ return call("guesses?select=prompt,answer,n&limit=5000&prompt=in.("+encodeURIComponent(prompts.map(s=>'"'+s.replace(/["\\]/g,"")+'"').join(","))+")"); },
+    submit(day,name,feet,goals){ return call("rpc/submit_score",{p_day:day,p_board:"daily",p_name:name,p_feet:feet,p_goals:goals,p_device:device()}); },
+    board(day){ return call("scores?select=name,feet,goals&day=eq."+day+"&board=eq.daily&order=feet.desc,created_at.asc&limit=50"); } };
+})();
+const crowd={};                                   // prompt -> {answer: times said}
+function loadCrowd(){ if(!NET.on()||!state) return; const names=state.picks.map(i=>PROMPTS[i].s).filter(s=>!crowd[s]); if(!names.length) return;
+  names.forEach(s=>crowd[s]={});
+  NET.counts(names).then(rows=>{ (rows||[]).forEach(r=>{ (crowd[r.prompt]=crowd[r.prompt]||{})[r.answer]=r.n; });
+    state.picks.forEach((pi,k)=>{ if(k>state.idx||(k===state.idx&&state.view==="intro")) rankSet(setOf(pi),crowd[PROMPTS[pi].s]); }); }).catch(()=>{ names.forEach(s=>delete crowd[s]); }); }
+
+/* ================= sound: everything is synthesized, no audio files ================= */
+const SFX=(()=>{
+  let ctx=null,out=null,nbuf=null,on=store.get("c2c-sound")!==false;
+  const ac=()=>{ if(!on) return null; try{
+      if(!ctx){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ctx=new C(); out=ctx.createGain(); out.gain.value=.5; const comp=ctx.createDynamicsCompressor(); out.connect(comp); comp.connect(ctx.destination);
+        nbuf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate); const d=nbuf.getChannelData(0); let b=0; for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; b=(b+.04*w)/1.04; d[i]=w*.45+b*5; } }
+      if(ctx.state==="suspended") ctx.resume(); return ctx; }catch(e){ return null; } };
+  const env=(g,t,a,peak,hold,rel)=>{ g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+a); g.gain.setValueAtTime(peak,t+a+hold); g.gain.exponentialRampToValueAtTime(.0001,t+a+hold+rel); };
+  const tone=(type,f,t,a,peak,hold,rel,dest,f2)=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type=type; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+a+hold+rel); env(g,t,a,peak,hold,rel); o.connect(g); g.connect(dest||out); o.start(t); o.stop(t+a+hold+rel+.05); };
+  const noise=(t,dur,type,f1,f2,q,peak,a,rel)=>{ const s=ctx.createBufferSource(),fl=ctx.createBiquadFilter(),g=ctx.createGain(); s.buffer=nbuf; s.loop=true; fl.type=type; fl.Q.value=q; fl.frequency.setValueAtTime(f1,t); if(f2) fl.frequency.exponentialRampToValueAtTime(f2,t+dur); env(g,t,a,peak,Math.max(0,dur-a-rel),rel); s.connect(fl); fl.connect(g); g.connect(out); s.start(t,Math.random()); s.stop(t+dur+.1); };
+  const play=fn=>(...args)=>{ if(!ac()) return; try{ fn(ctx.currentTime+.01,...args); }catch(e){} };
+  return {
+    get on(){ return on; },
+    toggle(){ on=!on; store.set("c2c-sound",on); if(on) ac(); else if(ctx) try{ ctx.suspend(); }catch(e){} return on; },
+    unlock(){ ac(); },
+    tap:play(t=>{ noise(t,.07,"lowpass",1800,0,1,.5,.004,.05); tone("sine",190,t,.004,.35,.01,.09,null,90); }),          // stick tap: answer accepted, puck stops
+    miss:play(t=>{ tone("sine",150,t,.005,.28,.02,.12,null,70); }),                                                      // dull thud: not found
+    carve:play((t,dur)=>{ noise(t,dur,"bandpass",900,3400,1.2,.2,.08,Math.min(.5,dur*.4)); }),                          // skate carve during the rush
+    line:play((t,k)=>{ tone("triangle",[520,660,780,1040][k]||660,t,.004,.1,.01,.09); }),                               // crossing a line
+    tick:play(t=>{ tone("square",1100,t,.001,.05,.004,.03); }),                                                          // last five seconds
+    buzzer:play(t=>{ const lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=900; lp.connect(out); tone("square",148,t,.01,.2,.75,.08,lp); tone("square",151.5,t,.01,.2,.75,.08,lp); }),
+    ping:play(t=>{ [[2093,.3,.7],[3136,.17,.5],[4186,.1,.4],[5274,.05,.3]].forEach(([f,p,r])=>tone("sine",f,t,.002,p,.005,r)); noise(t,.03,"highpass",4000,0,1,.25,.002,.02); }),   // puck off the crossbar
+    horn:play((t,delay)=>{ t+=delay||0; const lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=1100; lp.connect(out);
+      [116.54,146.83,174.61,233.08].forEach((f,i)=>{ tone("sawtooth",f,t,.05,.15,1.5,.5,lp); tone("sawtooth",f*1.006,t,.05,.07,1.5,.5,lp); });
+      noise(t+.05,3.2,"bandpass",700,1100,.5,.28,.4,2.2); })                                                             // goal horn with a crowd swell
+  };
+})();
+const SND_ICON=on=>`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" stroke="none"/>${on?'<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>':'<path d="m16 9 6 6"/><path d="m22 9-6 6"/>'}</svg>`;
+function drawSnd(){ const b=$("snd"); b.innerHTML=SND_ICON(SFX.on); b.setAttribute("aria-label",SFX.on?"Sound on":"Sound off"); b.setAttribute("aria-pressed",SFX.on); }
+
+/* ================= rink canvas ================= */
+const app=$("app"), cv=$("rink"), cx=cv.getContext("2d"), card=$("card");
+let W=0,H=0,S=1,ox=0,oy=0,TOP=74,vert=true,dpr=1,staticLayer=null,recap=null;
+const anim={x:11,target:11,t0:0,dur:0,running:false,shown:false,done:null,parts:[],flash:{},goalAt:0,gold:false,zero:false,idle:true,onMove:null};
+const TIER_RGB=["85,102,122","142,158,173","74,134,240","123,211,255","234,242,248","255,61,85","255,200,87"];
+function seeded(n){ let a=n; return ()=>{ a=(a*1664525+1013904223)>>>0; return a/4294967296; }; }
+function rr(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+/* rink feet -> screen. Tall screens stand the rink on end: your goal line at the bottom, the far net at the top. */
+function toFeet(c){ if(vert) c.setTransform(0,-S*dpr,S*dpr,0,ox*dpr,(oy+200*S)*dpr); else c.setTransform(S*dpr,0,0,S*dpr,ox*dpr,oy*dpr); }
+const screenOf=(x,y)=>vert?[ox+y*S,oy+(200-x)*S]:[ox+x*S,oy+y*S];
+function layout(){ W=app.clientWidth; H=app.clientHeight; if(!W||!H) return false; TOP=$("top").offsetHeight-8; app.style.setProperty("--top",TOP+"px");
+  const reserve=(state&&state.view==="done")?card.offsetHeight+22:0;                       // the final card sits under the rink so the recap stays visible
+  const pad=8, aw=W-2*pad, ah=Math.max(120,H-TOP-pad-reserve), sv=Math.min(aw/88,ah/203), sh=Math.min(aw/203,ah/88); vert=reserve?sv>=sh*.8:sv>=sh; S=vert?sv:sh;
+  const rw=(vert?85:200)*S, rh=(vert?200:85)*S; ox=(W-rw)/2; oy=TOP+(ah-rh)/2; return true; }
+function paintRink(c,glow){                        // draws the rink in feet; the caller sets the transform
+  c.save(); c.shadowColor="rgba(123,211,255,.3)"; c.shadowBlur=glow; rr(c,0,0,200,85,28); c.fillStyle="#0D1A27"; c.fill(); c.restore();
+  const g=c.createRadialGradient(100,42.5,5,100,42.5,125); g.addColorStop(0,"#1D3A55"); g.addColorStop(1,"#0D1B29");
+  rr(c,0,0,200,85,28); c.fillStyle=g; c.fill();
+  c.save(); rr(c,0,0,200,85,28); c.clip();
+  const rnd=seeded(7); c.lineWidth=.16;
+  for(let i=0;i<170;i++){ const x=rnd()*200,y=rnd()*85,r=6+rnd()*26,a0=rnd()*6.28; c.strokeStyle=`rgba(200,230,255,${.03+rnd()*.06})`; c.beginPath(); c.arc(x,y,r,a0,a0+.3+rnd()*.9); c.stroke(); }
+  c.fillStyle="rgba(74,134,240,.95)"; c.fillRect(74.4,0,1.2,85); c.fillRect(124.4,0,1.2,85);
+  c.fillStyle="rgba(255,61,85,.9)"; c.fillRect(99.5,0,1,85);
+  c.strokeStyle="rgba(255,61,85,.75)"; c.lineWidth=.35; c.beginPath(); c.moveTo(11,0); c.lineTo(11,85); c.moveTo(189,0); c.lineTo(189,85); c.stroke();
+  c.restore();
+  c.lineWidth=.35; c.strokeStyle="rgba(74,134,240,.8)"; c.beginPath(); c.arc(100,42.5,15,0,6.2832); c.stroke();
+  c.strokeStyle="rgba(255,61,85,.55)"; c.fillStyle="rgba(255,61,85,.8)";
+  for(const [x,y] of [[31,20.5],[31,64.5],[169,20.5],[169,64.5]]){ c.beginPath(); c.arc(x,y,15,0,6.2832); c.stroke(); c.beginPath(); c.arc(x,y,1,0,6.2832); c.fill(); }
+  for(const [x,y] of [[80,20.5],[80,64.5],[120,20.5],[120,64.5]]){ c.beginPath(); c.arc(x,y,1,0,6.2832); c.fill(); }
+  c.fillStyle="rgba(123,211,255,.18)"; c.strokeStyle="rgba(255,61,85,.75)";
+  c.beginPath(); c.moveTo(11,36.5); c.arc(11,42.5,6,-Math.PI/2,Math.PI/2); c.closePath(); c.fill(); c.stroke();
+  c.beginPath(); c.moveTo(189,48.5); c.arc(189,42.5,6,Math.PI/2,-Math.PI/2); c.closePath(); c.fill(); c.stroke();
+  c.strokeStyle="rgba(234,242,248,.85)"; c.lineWidth=.5; c.strokeRect(7.6,39.5,3.4,6); c.strokeRect(189,39.5,3.4,6);
+  rr(c,0,0,200,85,28); c.lineWidth=1.3; c.strokeStyle="#415A72"; c.stroke();
+  rr(c,1.1,1.1,197.8,82.8,26.9); c.lineWidth=.35; c.strokeStyle="rgba(123,211,255,.4)"; c.stroke();
+}
+function buildStatic(){
+  staticLayer=document.createElement("canvas"); staticLayer.width=cv.width; staticLayer.height=cv.height;
+  const c=staticLayer.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+  const [mx,my]=screenOf(100,42.5), R=Math.max(W,H)*.75, bg=c.createRadialGradient(mx,my,0,mx,my,R);
+  bg.addColorStop(0,"rgba(44,96,138,.34)"); bg.addColorStop(1,"rgba(5,8,13,0)"); c.fillStyle=bg; c.fillRect(0,0,W,H);
+  toFeet(c); paintRink(c,34*dpr);
+}
+/* the final recap as a 1200 x 630 picture, for sharing and for the link preview */
+function recapItems(){ return state.results.map((r,k)=>{ const set=setOf(state.picks[k]), a=r.i>=0?set.ans[r.i]:null, ti=tierOf(r.feet,r.pct||0);
+  return {feet:r.feet,t:ti.t,name:a?a.name:(r.how==="pass"?"Passed":"Time's up"),dist:a?(ti.t>=5?ti.name.toUpperCase():r.feet+" FT"):""}; }); }
+function shareCanvas(promo){
+  const Wd=1200,Hd=630,c=document.createElement("canvas"); c.width=Wd; c.height=Hd; const x=c.getContext("2d");
+  const F=(w,px)=>`italic ${w} ${px}px "Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif`, sp=v=>{ try{ x.letterSpacing=v; }catch(e){} };
+  x.fillStyle="#05080D"; x.fillRect(0,0,Wd,Hd); const bg=x.createRadialGradient(600,300,0,600,300,720); bg.addColorStop(0,"rgba(44,96,138,.42)"); bg.addColorStop(1,"rgba(5,8,13,0)"); x.fillStyle=bg; x.fillRect(0,0,Wd,Hd);
+  const items=promo?[{feet:11,t:1,name:"Wayne Gretzky",dist:"11 FT"},{feet:52,t:1,name:"Mats Sundin",dist:"52 FT"},{feet:96,t:2,name:"Phil Kessel",dist:"96 FT"},{feet:131,t:3,name:"Wendel Clark",dist:"131 FT"},{feet:168,t:4,name:"Jonathan Cheechoo",dist:"168 FT"},{feet:193,t:5,name:"Pat Verbeek",dist:"GOAL"},{feet:200,t:6,name:"Hugh Jessiman",dist:"BAR DOWN"}]:recapItems();
+  x.textBaseline="alphabetic"; x.fillStyle="#F4FAFF"; x.beginPath(); x.arc(60,52,9,0,6.2832); x.fill();
+  x.fillStyle="#EAF2F8"; x.font=F(800,46); sp("0.04em"); x.fillText(NAME.toUpperCase(),82,68);
+  x.textAlign="right"; x.font=F(700,26); sp("0.12em"); x.fillStyle="#8E9EAD"; x.fillText((promo?"NHL trivia":modeLabel()).toUpperCase(),Wd-48,66); x.textAlign="left";
+  const s=4.6, x0=(Wd-200*s)/2, y0=94;
+  x.save(); x.setTransform(s,0,0,s,x0,y0); paintRink(x,40);
+  items.forEach((it,k)=>{ const y=10.5+k*10.67, rgb=TIER_RGB[it.t], tx=it.feet>0?Math.min(it.feet,191):11;
+    if(it.feet>0){ const gr=x.createLinearGradient(11,0,Math.max(12,tx),0); gr.addColorStop(0,`rgba(${rgb},0)`); gr.addColorStop(1,`rgba(${rgb},.8)`); x.strokeStyle=gr; x.lineWidth=.8; x.lineCap="round"; x.beginPath(); x.moveTo(11,y); x.lineTo(tx,y); x.stroke();
+      const pg=x.createRadialGradient(tx,y,0,tx,y,7); pg.addColorStop(0,`rgba(${rgb},.7)`); pg.addColorStop(1,`rgba(${rgb},0)`); x.fillStyle=pg; x.beginPath(); x.arc(tx,y,7,0,6.2832); x.fill(); x.fillStyle=`rgb(${rgb})`; x.beginPath(); x.arc(tx,y,1.9,0,6.2832); x.fill(); }
+    else { x.strokeStyle=`rgba(${rgb},.9)`; x.lineWidth=.45; x.beginPath(); x.arc(11,y,1.8,0,6.2832); x.stroke(); } });
+  if(items.some(it=>it.t>=5)){ const col=items.some(it=>it.t===6)?"255,200,87":"255,61,85"; x.strokeStyle=`rgb(${col})`; x.lineWidth=.8; x.strokeRect(189,39.5,3.4,6); x.fillStyle=`rgb(${col})`; x.beginPath(); x.arc(196.2,42.5,1.5,0,6.2832); x.fill(); }
+  x.restore();
+  x.textBaseline="middle"; x.font=F(700,23); sp("0.05em"); x.shadowColor="rgba(3,8,13,.95)"; x.shadowBlur=7;
+  items.forEach((it,k)=>{ const tx=it.feet>0?Math.min(it.feet,191):11, px=x0+tx*s, py=y0+(10.5+k*10.67)*s, n=it.name.toUpperCase(), wn=x.measureText(n).width, wd=it.dist?x.measureText(it.dist).width:0, w=wn+(it.dist?10+wd:0);
+    const ahead=(189-tx)*s>=w+44, lx=ahead?px+19:px-19-w, ly=ahead?py+1:py-19;
+    for(let i=0;i<2;i++){ x.fillStyle=it.feet>0?"#EAF2F8":"#8E9EAD"; x.fillText(n,lx,ly); if(it.dist){ x.fillStyle=`rgb(${it.t<=1?"168,182,195":TIER_RGB[it.t]})`; x.fillText(it.dist,lx+wn+10,ly); } } });
+  x.shadowBlur=0; x.textBaseline="alphabetic";
+  const site=SITE.replace(/^https?:\/\//,"").replace(/\/$/,"");
+  if(promo){ x.fillStyle="#EAF2F8"; x.font=F(800,62); sp("0.02em"); x.fillText("THE RAREST ANSWER WINS.",48,572);
+    x.font='500 23px "Onest",system-ui,sans-serif'; sp("0em"); x.fillStyle="#8E9EAD"; x.fillText("Seven NHL prompts a day. The more obscure your answer, the further you carry the puck.",50,606); }
+  else { const t=total(), goals=state.results.filter(r=>r.feet>=GOAL_LINE).length;
+    x.fillStyle="#EAF2F8"; x.font=F(800,104); sp("0em"); const tw=x.measureText(fmt(t)).width; x.fillText(fmt(t),48,606);
+    x.font=F(700,34); x.fillStyle="#8E9EAD"; sp("0.06em"); x.fillText("FT",48+tw+12,606);
+    x.font=F(700,34); x.fillStyle="#EAF2F8"; sp("0.05em"); x.fillText(`${rating(t)}. ${goals} ${goals===1?"goal":"goals"}.`.toUpperCase(),48+tw+70,570);
+    x.font='500 22px "Onest",system-ui,sans-serif'; sp("0em"); x.fillStyle="#8E9EAD"; x.fillText("Can you beat it?  "+site,48+tw+72,604); }
+  return c;
+}
+function resize(){ if(!layout()) return; dpr=Math.min(2,window.devicePixelRatio||1); cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); buildStatic();
+  const [fx,fy]=screenOf(191,42.5), f=$("flash"); f.style.setProperty("--fx",(100*fx/W)+"%"); f.style.setProperty("--fy",(100*fy/H)+"%");
+  if(state) positionCard(); draw(performance.now()); }
+const ease=t=>1-Math.pow(1-t,4);
+function label(x,y,name,dist,rgb,dim){ const [sx,sy]=screenOf(x,y); cx.save(); cx.setTransform(dpr,0,0,dpr,0,0); cx.translate(sx,sy); if(vert) cx.rotate(-Math.PI/2);
+  const tight=10.67*S<34, fs=tight?13:15; cx.font=`italic 700 ${fs}px "Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif`; try{ cx.letterSpacing="0.05em"; }catch(e){}
+  cx.textBaseline="middle"; cx.textAlign="left";
+  const n=name.toUpperCase(), gap=8, wn=cx.measureText(n).width, wd=dist?cx.measureText(dist).width:0, w=wn+(dist?gap+wd:0);
+  const ahead=(189-x)*S>=w+30, x0=ahead?13:-13-w, py=ahead?1:tight?1:-(fs*.5+4);       // sit ahead of the puck when there is room, otherwise behind it
+  if(!ahead&&tight){ cx.fillStyle="rgba(11,22,33,.92)"; cx.fillRect(x0-5,py-fs*.62,w+10,fs*1.24); }   // tight lanes: a small plate keeps the trail from running through the name
+  cx.shadowColor="rgba(3,8,13,.95)"; cx.shadowBlur=6;
+  for(let i=0;i<2;i++){ cx.fillStyle=dim?"#8E9EAD":"#EAF2F8"; cx.fillText(n,x0,py); if(dist){ cx.fillStyle=`rgb(${rgb})`; cx.fillText(dist,x0+wn+gap,py); } }
+  cx.restore(); }
+function drawRecap(now){                                      // final screen: all seven pucks where they stopped, one lane each
+  recap.items.forEach((it,k)=>{ const y=10.5+k*10.67, st=recap.t0+k*240, dur=650+650*(it.feet/200), t=REDUCED?1:Math.max(0,Math.min(1,(now-st)/dur)), rgb=TIER_RGB[it.t];
+    const tx=it.feet>0?Math.min(it.feet,191):11, x=11+(tx-11)*ease(t);
+    if(t>=1&&!it.landed){ it.landed=true; if(!REDUCED&&now-recap.t0<6000){ if(it.t>=5){ SFX.line(3); burst(tx,y,22,rgb); } else if(it.feet>0) SFX.tap(); } }
+    if(it.feet>0&&t>0){ const gr=cx.createLinearGradient(11,0,Math.max(12,x),0); gr.addColorStop(0,`rgba(${rgb},0)`); gr.addColorStop(1,`rgba(${rgb},.75)`); cx.strokeStyle=gr; cx.lineWidth=.8; cx.lineCap="round"; cx.beginPath(); cx.moveTo(11,y); cx.lineTo(x,y); cx.stroke(); }
+    if(it.feet>0){ if(t>0){ const pg=cx.createRadialGradient(x,y,0,x,y,7); pg.addColorStop(0,`rgba(${rgb},.7)`); pg.addColorStop(1,`rgba(${rgb},0)`); cx.fillStyle=pg; cx.beginPath(); cx.arc(x,y,7,0,6.2832); cx.fill(); cx.fillStyle=`rgb(${rgb})`; cx.beginPath(); cx.arc(x,y,1.9,0,6.2832); cx.fill(); } }
+    else { cx.strokeStyle=`rgba(${rgb},.9)`; cx.lineWidth=.45; cx.beginPath(); cx.arc(11,y,1.8,0,6.2832); cx.stroke(); }
+    if(t>=1||it.feet<=0) label(tx,y,it.name,it.dist,it.t<=1?"168,182,195":rgb,it.feet<=0); });
+  if(recap.items.some(it=>it.landed&&it.t>=5)){ const col=recap.items.some(it=>it.landed&&it.t===6)?"255,200,87":"255,61,85"; cx.strokeStyle=`rgba(${col},1)`; cx.lineWidth=.8; cx.strokeRect(189,39.5,3.4,6); cx.fillStyle=`rgba(${col},1)`; cx.beginPath(); cx.arc(196.2,42.5,1.5,0,6.2832); cx.fill(); }
+}
+function draw(now){
+  if(!staticLayer) return;
+  cx.setTransform(1,0,0,1,0,0); cx.clearRect(0,0,cv.width,cv.height); cx.drawImage(staticLayer,0,0); toFeet(cx);
+  const Y=42.5;
+  if(recap){ drawRecap(now); anim.parts=anim.parts.filter(p=>now-p.t0<p.life); for(const p of anim.parts){ const a=(now-p.t0)/p.life; cx.fillStyle=`rgba(${p.col},${(1-a)*.9})`; cx.beginPath(); cx.arc(p.x+p.vx*a,p.y+p.vy*a,p.r*(1-a*.5),0,6.2832); cx.fill(); } return; }
+  for(const k in anim.flash){ const age=(now-anim.flash[k])/500; if(age>=1){ delete anim.flash[k]; continue; }
+    const x=+k, col=(x===100||x===189)?"255,61,85":"123,170,255"; cx.save(); cx.globalAlpha=1-age; cx.shadowColor=`rgba(${col},1)`; cx.shadowBlur=14*dpr; cx.fillStyle=`rgba(${col},1)`; cx.fillRect(x-.8,2,1.6,81); cx.restore(); }
+  let x=anim.x, vel=0;
+  if(anim.running){ const t=Math.min(1,(now-anim.t0)/anim.dur), nx=11+(anim.target-11)*ease(t); vel=nx-anim.x;
+    [75,100,125,189].forEach((L,k)=>{ if(anim.x<L&&nx>=L){ anim.flash[L]=now; SFX.line(k); } });
+    anim.x=x=nx; if(anim.onMove) anim.onMove(x);
+    if(t>=1){ anim.running=false; const goal=anim.target>=GOAL_LINE; burst(x,Y,goal?52:18,goal?(anim.gold?"255,200,87":"255,61,85"):"190,232,255"); if(goal) anim.goalAt=now; const d=anim.done; anim.done=null; if(d) d(); } }
+  if(anim.shown&&!anim.zero){
+    const gr=cx.createLinearGradient(11,0,Math.max(12,x),0); gr.addColorStop(0,"rgba(123,211,255,0)"); gr.addColorStop(1,"rgba(123,211,255,.6)");
+    cx.strokeStyle=gr; cx.lineWidth=.7; cx.lineCap="round"; cx.beginPath(); cx.moveTo(11,Y); cx.lineTo(x,Y); cx.stroke();
+    if(anim.running){ const len=Math.min(60,6+vel*14), tg=cx.createLinearGradient(x-len,0,x,0); tg.addColorStop(0,"rgba(123,211,255,0)"); tg.addColorStop(1,"rgba(220,244,255,.95)");
+      cx.strokeStyle=tg; cx.lineWidth=2.2; cx.beginPath(); cx.moveTo(Math.max(11,x-len),Y); cx.lineTo(x,Y); cx.stroke(); } }
+  if(anim.goalAt){ const age=(now-anim.goalAt)/1000, pulse=.55+.45*Math.sin(age*9), col=anim.gold?"255,200,87":"255,61,85", a=REDUCED?.8:Math.max(.35,pulse*(age<2.4?1:.6));
+    const lg=cx.createRadialGradient(191,Y,0,191,Y,17); lg.addColorStop(0,`rgba(${col},${a})`); lg.addColorStop(1,`rgba(${col},0)`); cx.fillStyle=lg; cx.beginPath(); cx.arc(191,Y,17,0,6.2832); cx.fill();
+    cx.strokeStyle=`rgba(${col},1)`; cx.lineWidth=.8; cx.strokeRect(189,39.5,3.4,6); cx.fillStyle=`rgba(${col},1)`; cx.beginPath(); cx.arc(196.2,Y,1.5,0,6.2832); cx.fill(); }
+  anim.parts=anim.parts.filter(p=>now-p.t0<p.life);
+  for(const p of anim.parts){ const a=(now-p.t0)/p.life; cx.fillStyle=`rgba(${p.col},${(1-a)*.9})`; cx.beginPath(); cx.arc(p.x+p.vx*a,p.y+p.vy*a,p.r*(1-a*.5),0,6.2832); cx.fill(); }
+  if(anim.zero){ cx.strokeStyle="rgba(142,158,173,.85)"; cx.lineWidth=.5; cx.beginPath(); cx.arc(11,Y,2.2,0,6.2832); cx.stroke(); }
+  else { const col=anim.goalAt?(anim.gold?"255,200,87":"255,61,85"):"123,211,255";
+    if(anim.idle&&!REDUCED){ const ph=(now%1800)/1800; cx.strokeStyle=`rgba(123,211,255,${.6*(1-ph)})`; cx.lineWidth=.4; cx.beginPath(); cx.arc(x,Y,2.4+ph*9,0,6.2832); cx.stroke(); }
+    const pg=cx.createRadialGradient(x,Y,0,x,Y,11); pg.addColorStop(0,`rgba(${col},.75)`); pg.addColorStop(1,`rgba(${col},0)`); cx.fillStyle=pg; cx.beginPath(); cx.arc(x,Y,11,0,6.2832); cx.fill();
+    cx.fillStyle="#F4FAFF"; cx.beginPath(); cx.arc(x,Y,2.3,0,6.2832); cx.fill(); }
+  placeReadout();
+}
+function burst(x,y,n,col){ if(REDUCED) return; const now=performance.now(); for(let i=0;i<n;i++){ const a=Math.random()*6.2832, sp=4+Math.random()*(n>20?26:12); anim.parts.push({x,y,vx:Math.cos(a)*sp-(n>20?6:3),vy:Math.sin(a)*sp,r:.5+Math.random()*.9,life:500+Math.random()*700,t0:now,col}); } }
+function placeReadout(){ const el=$("readout"); if(el.hidden) return; const [px,py]=screenOf(anim.zero?11:anim.x,42.5), w=el.offsetWidth, h=el.offsetHeight; let x,y;
+  if(vert){ x=px+18; y=py-h/2; } else { x=px-w/2; y=py-h-16; }
+  x=Math.max(8,Math.min(W-w-8,x)); y=Math.max(TOP+6,Math.min(H-h-8,y)); el.style.transform=`translate(${Math.round(x)}px,${Math.round(y)}px)`; }
+const ZONES=[[189,"Goal",5],[125,"Offensive zone",3],[75,"Neutral zone",2],[0,"Defensive zone",1]];
+function liveReadout(x,feet){ $("feet").textContent=Math.min(feet,Math.round(x)); const z=ZONES.find(z=>x>=z[0]), el=$("zone"); if(el.textContent!==z[1]){ el.textContent=z[1]; $("readout").className="readout t"+z[2]; } }
+function setReadout(feet,t){ const ro=$("readout"); ro.hidden=!t||t.t===0; if(ro.hidden) return; $("feet").textContent=feet; $("zone").textContent=t.name; ro.className="readout t"+t.t; }
+function puckReset(idle){ recap=null; Object.assign(anim,{x:11,target:11,running:false,shown:false,done:null,goalAt:0,gold:false,zero:false,idle:idle!==false,flash:{},parts:[],onMove:null}); setReadout(0,null); }
+function puckPlace(feet,pct){ recap=null; const t=tierOf(feet,pct); Object.assign(anim,{x:feet>0?Math.min(feet,191):11,target:feet,running:false,shown:feet>0,done:null,goalAt:feet>=GOAL_LINE?performance.now()-3000:0,gold:t.t===6,zero:feet<=0,idle:false,flash:{},parts:[],onMove:null}); setReadout(feet,t); }
+function puckRush(feet,pct,done){
+  const t=tierOf(feet,pct);
+  if(feet<=0){ Object.assign(anim,{zero:true,idle:false,shown:false}); setReadout(0,t); setTimeout(done,REDUCED?0:450); return; }
+  if(REDUCED){ puckPlace(feet,pct); if(t.t>=5) SFX.horn(); done(); return; }
+  setReadout(0,{t:1,name:"Defensive zone"});
+  const dur=900+1700*(feet/200); SFX.carve(dur/1000);
+  Object.assign(anim,{x:11,target:Math.min(feet,191),t0:performance.now(),dur,running:true,shown:true,idle:false,zero:false,goalAt:0,gold:t.t===6,
+    onMove:x=>liveReadout(x,feet),
+    done:()=>{ setReadout(feet,t);
+      if(t.t>=5){ if(t.t===6){ SFX.ping(); SFX.horn(.28); } else SFX.horn(); const f=$("flash"); f.className="flash"+(t.t===6?" gold":""); void f.offsetWidth; f.classList.add("go"); app.classList.remove("shake"); void app.offsetWidth; app.classList.add("shake"); }
+      else SFX.tap();
+      setTimeout(done,t.t>=5?800:350); }});
+}
+function loop(now){ if(!document.hidden){ draw(now); if(state&&state.view==="ask") tickClock(); } requestAnimationFrame(loop); }
+
+/* ================= views ================= */
+const BADGE=t=>{ const w=46*[0,.32,.5,.72,.9,1,1][t];
+  return `<svg width="50" height="22" viewBox="0 0 50 22" aria-hidden="true"><rect x="1" y="1" width="48" height="20" rx="7" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/><clipPath id="bc${t}"><rect x="2" y="2" width="46" height="18" rx="6"/></clipPath><rect x="2" y="2" width="${w}" height="18" fill="currentColor" fill-opacity="${t>=5?1:.55}" clip-path="url(#bc${t})"/><line x1="19" y1="2" x2="19" y2="20" stroke="currentColor" stroke-opacity=".5"/><line x1="31" y1="2" x2="31" y2="20" stroke="currentColor" stroke-opacity=".5"/></svg>`; };
+function drawHud(){
+  $("total").textContent=fmt(total());
+  let h=""; for(let k=0;k<N_PROMPTS;k++){ const t=tierFor(k); h+=`<li class="${t?"t"+t.t:(k===state.idx&&state.view==="ask"?"now":"")}"></li>`; } $("pips").innerHTML=h;
+  for(const m of ["daily","free","pack"]){ const b=$("m-"+m); b.classList.toggle("on",state.mode===m); b.setAttribute("aria-pressed",state.mode===m); }
+}
+const modeLabel=()=>state.mode==="daily"?`Daily · ${dayLabel(state.key)}`:state.mode==="pack"?packName(state.pack):"Free skate";
+function positionCard(){
+  card.classList.remove("pos-upper","pos-center","pos-bottom","pos-fill"); card.style.maxHeight="";
+  const v=state.view;
+  if(v==="done") return card.classList.add("pos-bottom");
+  if(v==="result"){ const r=state.results[state.idx], f=r?r.feet:0;
+    if(vert){ const h=card.offsetHeight, py=screenOf(Math.max(11,Math.min(f,191)),42.5)[1]; card.classList.add((H-14-h)-py>py-(TOP+.04*H+h)?"pos-bottom":"pos-upper"); }
+    else { card.classList.add("pos-bottom"); card.style.maxHeight=Math.max(210,H-(oy+42.5*S)-44)+"px"; }
+    return; }
+  card.classList.add(vert?"pos-upper":"pos-center");
+}
+function show(html,extra){ card.className="card"+(extra?" "+extra:""); card.innerHTML=html; positionCard(); }
+/* one sheet for the answer list, the pack menu, the score breakdown and credits */
+let sheetBack=null;
+function openSheet(title,html,back){ $("sheett").textContent=title; $("sheetbody").innerHTML=html; $("sheet").hidden=false; $("sheetbody").scrollTop=0; sheetBack=back||null; $("sheetx").focus({preventScroll:true}); }
+function closeSheet(){ const sh=$("sheet"); if(sh.hidden) return; sh.hidden=true; const b=sheetBack&&$(sheetBack); if(b) b.focus({preventScroll:true}); }
+const CREDITS=`<p class="credits">Season, career and playoff numbers come from the NHL's public stats feed by way of the open NHL Stats Comparison dataset. They are refreshed weekly and were last updated ${esc(DATA.asOf||"")}. Splits for players traded mid-season and award history through 2017–18 come from the Hockey Databank; later awards were checked against Wikipedia. Draft records from 1963 to 2022 come from the open NHL Draft Explorer dataset.</p>
+  <p class="credits">The information used herein was obtained free of charge from and is copyrighted by the Hockey Databank project. For more information about the Hockey Databank project please visit http://sports.groups.yahoo.com/group/hockey-databank</p>
+  <p class="credits">The idea of scoring answers by how rare they are comes from Krillion (krillion.io), a daily trivia game.</p>
+  <p class="credits">How obvious each answer is comes from a formula built on career numbers, peak seasons, awards and recency, plus a hand-kept list of cult favourites for the "too clever" call. Expect some odd calls. This is a fan project and is not affiliated with the NHL.</p>`;
+let packTab="themed";
+function openPacks(tab){ if(tab) packTab=tab; const teams=packTab==="teams";
+  openSheet("Packs",`<div class="tabs" role="tablist"><button type="button" role="tab" id="tab-themed" aria-selected="${!teams}">Themed</button><button type="button" role="tab" id="tab-teams" aria-selected="${teams}">Teams</button></div>
+    ${teams?`<ol class="teams">${TEAMS.map(([ab,name,nick])=>`<li><button type="button" data-pack="t-${ab}" style="--tc:${TEAMCOL[ab]||"#7BD3FF"}" aria-label="${esc(name)}, ${packPool("t-"+ab).length} prompts"><b>${ab}</b><span>${esc(nick)}</span></button></li>`).join("")}</ol>`
+      :`<ol class="packs">${PACKS.map(([id,name,blurb])=>`<li><button type="button" data-pack="${id}"><span class="pn">${name}</span><span class="pc">${packPool(id).length} prompts</span><span class="pb">${blurb}</span></button></li>`).join("")}</ol>`}`,"m-pack");
+  for(const t of ["themed","teams"]) $("tab-"+t).addEventListener("click",()=>{ openPacks(t); $("tab-"+t).focus({preventScroll:true}); });
+  $("sheetbody").querySelectorAll("[data-pack]").forEach(b=>b.addEventListener("click",()=>{ $("sheet").hidden=true; state=fresh("pack",b.dataset.pack); save(); render(true); }));
+}
+
+/* ---------- how to play ---------- */
+function openHow(back){
+  const i=PKEY.get("50-goal seasons"); let demo="";
+  if(i!=null){ const set=setOf(i), n=set.n, at=f=>set.ans[Math.round(f*(n-1))], ft=f=>Math.round(11+189*Math.round(f*(n-1))/(n-1));
+    demo=`<ol class="bars" aria-label="Three example answers">${[[0,"The obvious one"],[.6,"A good pull"],[1,"The rarest on the list"]].map(([f,lab])=>{ const ti=tierOf(ft(f),f);
+      return `<li class="t${ti.t}"><span class="lab">${lab}</span><span class="ft">${ti.t>=5?"Goal":ft(f)+" ft"}</span><span class="ans">${esc(at(f).name)}</span><span class="track"><b style="width:${ft(f)/2}%"></b></span></li>`; }).join("")}</ol>`; }
+  openSheet("How to play",`<ol class="how">
+      <li><b>1</b><div><h3>Seven prompts, thirty seconds each</h3><p>Each has plenty of right answers, like: name a player with a 50-goal season.</p></div></li>
+      <li><b>2</b><div><h3>The rarer your answer, the further the puck goes</h3><p>The obvious name barely leaves your crease. One nobody else thinks of goes the length of the ice.</p>${demo}</div></li>
+      <li><b>3</b><div><h3>Past the far goal line is a goal</h3><p>Wrong guesses cost only time. Your score is the total distance over all seven.</p></div></li>
+    </ol>
+    <p class="credits">The daily is the same seven for everyone and gets harder as it goes. Free skate and packs are unlimited.</p>
+    <div class="row"><button class="go wide" id="howgo" type="button">Got it</button></div>`,back);
+  store.set(K_SEEN,1); $("howgo").addEventListener("click",closeSheet); $("howgo").focus({preventScroll:true});
+}
+
+/* ---------- friend challenges: a link that carries the same seven prompts and a score to beat ---------- */
+const NAME_OK=/^[A-Za-z0-9 _.-]{1,16}$/, RUDE=/fuck|shit|cunt|bitch|nigg|fag|rape|nazi|hitler/i;
+const pid=i=>hash(PROMPTS[i].s).toString(36), PID=new Map(PROMPTS.map((p,i)=>[pid(i),i]));
+function challengeUrl(name){ const m=state.mode==="pack"?"p":state.mode==="daily"?"d":"f";
+  return SITE+"?c="+[m,m==="p"?state.pack:m==="d"?state.key:"",state.picks.map(pid).join("."),total(),encodeURIComponent(name||"")].join("~"); }
+function readChallenge(){ let q=""; try{ q=new URLSearchParams(location.search).get("c")||""; }catch(e){} if(!q) return null;
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  const [m,x,ids,feet,name]=q.split("~"), picks=String(ids||"").split(".").map(k=>PID.get(k)), f=Math.round(+feet);
+  if(!["d","f","p"].includes(m)||picks.length!==N_PROMPTS||picks.some(i=>i==null)||new Set(picks).size!==N_PROMPTS||!(f>=0&&f<=N_PROMPTS*200)) return {bad:true};
+  const nm=String(name||"").trim().replace(/\s+/g," "); return {m,x:x||"",picks,feet:f,name:NAME_OK.test(nm)&&!RUDE.test(nm)?nm:"",id:q}; }
+function takeChallenge(c){ const ch={feet:c.feet,name:c.name,id:c.id};
+  if(c.m==="d"&&c.x===today()){ const s=loadMode("daily"); if(s.picks.join()===c.picks.join()){ s.ch=ch; state=s; save(); return; } }      // today's daily: play (or compare) the real thing
+  const mode=c.m==="p"&&isPack(c.x)?"pack":"free", cur=adopt(store.get(KEYS[mode]));
+  if(valid(cur,mode)&&cur.ch&&cur.ch.id===c.id){ state=cur; save(); return; }                                                         // same link opened again: carry on
+  state=fresh(mode,mode==="pack"?c.x:null); state.picks=c.picks; state.ch=ch; save(); }
+const rival=()=>state.ch?(state.ch.name||"Your friend"):"";
+
+function viewIntro(focus){
+  const ch=state.ch, rk=state.pack==="rk", pack=state.mode==="pack";
+  const head=ch?`${esc(rival())} went ${fmt(ch.feet)} feet. Beat it.`:rk?"Seven easier prompts. Forty-five seconds each.":pack?(TEAM[state.pack]?`Seven prompts, all ${esc(packName(state.pack))}.`:`Seven prompts from the ${esc(packName(state.pack))} pack.`):state.mode==="daily"?"Seven prompts that get harder as you go.":"Seven prompts. Thirty seconds each.";
+  show(`<p class="eyebrow">${modeLabel()}${ch?" · Challenge":""}</p>
+    <h2>${head}</h2>
+    <p class="note">${ch?"You get the same seven prompts. ":""}Name the rarest answer you can think of. The more obscure it is, the further up ice the puck goes, and past the far goal line it's a goal. Wrong guesses cost nothing but time${rk?"":", and you get thirty seconds a prompt"}.</p>
+    <div class="row"><button class="go wide" id="start" type="button">Drop the puck</button><button class="link" id="how" type="button">How to play</button><button class="link" id="cred" type="button">Data and credits</button></div>
+    <p class="small">An unofficial fan project. Not affiliated with or endorsed by the NHL or its teams.</p>`);
+  $("start").addEventListener("click",()=>{ SFX.unlock(); SFX.tap(); begin(); });
+  $("how").addEventListener("click",()=>openHow("how"));
+  $("cred").addEventListener("click",()=>openSheet("Data and credits",CREDITS,"cred"));
+  puckReset();
+  if(focus) $("start").focus({preventScroll:true});
+}
+function begin(){ const set=curSet(), c=crowd[set.p.s]; if(c) rankSet(set,c);            // lock this prompt's order in before the clock starts
+  state.view="ask"; state.askStart=Date.now(); save(); render(true); }
+
+let lastClock="", lastSec=-1;
+function tickClock(){
+  const rem=remaining(), clock=$("clock"); if(!clock) return;
+  if(rem<=0) return settle(-1,"time");
+  const txt=rem>=10000?`0:${Math.ceil(rem/1000)}`:(rem/1000).toFixed(1);
+  if(txt!==lastClock){ clock.textContent=txt; lastClock=txt; }
+  const sec=Math.ceil(rem/1000); if(sec!==lastSec){ if(lastSec!==-1&&sec<=5) SFX.tick(); lastSec=sec; }
+  $("tbar").style.transform=`scaleX(${rem/limitOf()})`;
+  const cls=rem<5000?"crit":rem<10000?"warn":""; const row=$("timer"); if(row.dataset.s!==cls){ row.dataset.s=cls; row.className="timer "+cls; }
+}
+function viewAsk(focus){
+  if(remaining()<=0) return settle(-1,"time",true);
+  const set=curSet();
+  show(`<div class="timer" id="timer" data-s=""><div class="clockrow"><p class="eyebrow">${modeLabel()} · ${state.idx+1} of ${N_PROMPTS}</p><span class="clock" id="clock" aria-hidden="true"></span></div>
+      <div class="tbar"><b id="tbar"></b></div></div>
+    <h2>${esc(set.p.q)}</h2>
+    <p class="note">${esc(set.p.n)} ${set.n} answers.</p>
+    <form id="f" autocomplete="off">
+      <div class="field" id="field"><label class="sr" for="guess">Your answer</label>
+      <input id="guess" type="text" placeholder="Type a name" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="go"></div>
+      <button class="go" type="submit">Shoot</button>
+    </form>
+    <div class="under"><p class="fb" id="fb" role="status" aria-live="polite"></p><button class="link" type="button" id="pass">Pass</button></div>`);
+  lastClock=""; lastSec=-1; tickClock();
+  $("f").addEventListener("submit",e=>{ e.preventDefault(); guess($("guess").value); });
+  $("pass").addEventListener("click",()=>settle(-1,"pass"));
+  $("guess").addEventListener("input",()=>$("field").classList.remove("nope"));
+  puckReset();
+  if(focus) $("guess").focus({preventScroll:true});
+}
+function nope(msg,bad){ const fb=$("fb"); fb.className="fb"+(bad?" bad":""); fb.textContent=msg; const f=$("field"); f.classList.remove("nope"); void f.offsetWidth; f.classList.add("nope"); $("guess").select(); SFX.miss(); }
+function guess(text){
+  if(state.view!=="ask") return;
+  const m=judge(text,curSet());
+  if(m.type==="empty") return;
+  if(m.type==="hit"){ SFX.tap(); return settle(m.i,"hit"); }
+  if(m.type==="ambiguous") return nope("More than one answer fits. Add a first name.");
+  nope("Not found",true);
+}
+function settle(i,how,quiet){
+  if(state.view!=="ask") return;
+  const set=curSet(), a=i>=0?set.ans[i]:null;
+  state.results[state.idx]={i,nm:a?a.name:null,how,feet:a?a.feet:0,pct:a?a.pct:0,rank:a?a.rank:-1,said:a?a.said:0,tot:set.total,left:remaining()}; state.view="result"; save();
+  if(a) NET.logGuess(set.p.s,a.name);
+  if(how==="time"&&!quiet) SFX.buzzer();
+  viewResult(!quiet,!quiet);
+}
+const pctSaid=(said,tot)=>{ const v=100*said/tot; return v===0?"0%":v<1?"under 1%":Math.round(v)+"%"; };
+function answersHtml(set,mine){ const crowdOn=set.total>=20;
+  return `${crowdOn?`<p class="credits">Share of ${fmt(set.total)} player answers so far.</p>`:""}<ol class="all">${set.sorted.map(x=>{ const t=tierOf(x.feet,x.pct);
+    return `<li class="t${t.t}${x.bi===mine?" me":""}"><i></i><span>${esc(x.name)}${x.tc?"<em>too clever</em>":""}</span><span>${crowdOn?pctSaid(x.said,set.total)+" · ":""}${t.t>=5?t.name:x.feet+" ft"}</span></li>`; }).join("")}</ol>`; }
+function openAnswers(set,mine,back){ openSheet(`${set.p.s} · ${set.n} answers`,answersHtml(set,mine),back); const box=$("sheetbody"), me=box.querySelector(".me"); if(me) box.scrollTop=Math.max(0,me.offsetTop-box.offsetTop-140); }
+function viewResult(animate,focus){
+  const k=state.idx, set=curSet(), r=state.results[k], a=r.i>=0?set.ans[r.i]:null, t=tierOf(r.feet,r.pct||0), last=k===N_PROMPTS-1;
+  let who, line;
+  if(a){ who=esc(a.name); const d=detail(set.p,a), pc=Math.round(r.pct*100);
+    const rk=r.rank===set.n-1?`<b>The rarest</b> of the ${set.n} answers.`:r.rank===0?`<b>The most obvious</b> of the ${set.n} answers.`:`<b>Rarer than ${pc}%</b> of the ${set.n} answers.`;
+    const said=r.tot>=20?(r.said?` ${pctSaid(r.said,r.tot)} of players said this.`:" Nobody had said this yet."):"";
+    line=`${d?esc(d)+". ":""}${rk}${said}`; }
+  else if(r.how==="pass"){ who="Passed"; line="No ground gained on this one."; }
+  else { who="Time's up"; line="The buzzer went before you found one."; }
+  const fill=()=>{
+    show(`<p class="eyebrow">${state.idx+1} of ${N_PROMPTS} · ${esc(set.p.s)}</p>
+      <p class="who">${who}</p>
+      <span class="badge">${BADGE(t.t)}${t.name}</span>
+      <p class="rare">${line}</p>
+      ${a&&a.tc?`<p class="tcbox"><b>Too clever</b><span>Everyone's go-to deep cut, so it travels less.</span></p>`:""}
+      <div class="row"><button class="go wide" id="next" type="button">${last?"Final score":"Next prompt"}</button><button class="go wide ghost" id="allbtn" type="button">All answers</button></div>`,"t"+t.t);
+    $("allbtn").addEventListener("click",()=>openAnswers(set,r.i,"allbtn"));
+    $("next").addEventListener("click",()=>{ closeSheet(); if(last){ state.view="done"; finish(); save(); render(true); } else { state.idx++; begin(); } });
+    drawHud(); if(focus) $("next").focus({preventScroll:true}); };
+  if(animate){ if(r.how==="time"&&!REDUCED){ card.classList.remove("buzz"); void card.offsetWidth; card.classList.add("buzz"); }
+    setTimeout(()=>{ card.classList.add("hide"); puckRush(r.feet,r.pct||0,fill); },r.how==="time"&&!REDUCED?420:0); }
+  else { puckPlace(r.feet,r.pct||0); fill(); }
+}
+
+/* ---------- achievements and records (kept on this device) ---------- */
+const ACH=[["goal","Lamp lighter","Score your first goal."],["bar","Bar down","Find the single rarest answer on a list."],["hat","Hat trick","Three goals in one game."],
+  ["c2c","Coast to coast","1,200 feet or more in one game."],["clean","Full shift","Answer all seven prompts in a game."],["buzz","Buzzer beater","Lock in an answer with under two seconds left."],
+  ["tc","Too clever","Get caught using a go-to deep cut."],["rook","Called up","900 feet or more in Rookie mode."],["week","Iron man","Play the daily seven days in a row."],
+  ["packs","Pack rat","Finish a game in every themed pack."],["ten","Regular","Finish ten games."],["cent","Century","Score 100 goals in total."],
+  ["duel","Grudge match","Beat a friend's challenge."],["home","Home ice","Finish a game in a team pack."]];
+const dayKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function finish(){ if(state.counted) return; state.counted=true;
+  const R=state.results, t=total(), goals=R.filter(r=>r.feet>=GOAL_LINE).length, bars=R.filter(r=>r.i>=0&&r.pct>=.99).length, key=state.mode==="pack"?state.pack:state.mode;
+  for(const k of ["bestBy","days","ach","packs"]) if(!stats[k]||typeof stats[k]!=="object") stats[k]={};
+  stats.played++; stats.goals+=goals; stats.bars=(stats.bars||0)+bars; stats.best=Math.max(stats.best,t); stats.bestBy[key]=Math.max(stats.bestBy[key]||0,t);
+  if(state.mode==="pack") stats.packs[state.pack]=1;
+  if(state.mode==="daily"){ const d=new Date(); d.setDate(d.getDate()-1);
+    if(stats.lastDaily!==state.key){ stats.streak=stats.lastDaily===dayKey(d)?stats.streak+1:1; stats.lastDaily=state.key; }
+    stats.maxStreak=Math.max(stats.maxStreak||0,stats.streak); stats.days[state.key]=t;
+    const keep=Object.keys(stats.days).sort().slice(-120), nd={}; keep.forEach(k=>nd[k]=stats.days[k]); stats.days=nd; }
+  const got=[], unlock=(id,ok)=>{ if(ok&&!stats.ach[id]){ stats.ach[id]=today(); got.push(id); } };
+  unlock("goal",goals>=1); unlock("bar",bars>=1); unlock("hat",goals>=3); unlock("c2c",t>=1200); unlock("clean",R.every(r=>r.i>=0));
+  unlock("buzz",R.some(r=>r.i>=0&&r.left<2000)); unlock("tc",R.some((r,k)=>r.i>=0&&setOf(state.picks[k]).ans[r.i].tc)); unlock("rook",state.pack==="rk"&&t>=900);
+  unlock("week",stats.streak>=7); unlock("packs",PACKS.every(p=>stats.packs[p[0]])); unlock("ten",stats.played>=10); unlock("cent",stats.goals>=100);
+  unlock("duel",!!state.ch&&t>state.ch.feet); unlock("home",!!TEAM[state.pack]);
+  state.newAch=got; store.set(K_STATS,stats); }
+const feetTier=f=>f>=1200?6:f>=950?4:f>=650?3:f>=350?2:1;
+function calendarHtml(){ const now=new Date(), start=new Date(now.getFullYear(),now.getMonth(),now.getDate()-now.getDay()-28), tk=today(); let h="";
+  for(let i=0;i<35;i++){ const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i), k=dayKey(d), f=stats.days&&stats.days[k];
+    h+=`<li class="${f!=null?"t"+feetTier(f)+" on":""}${k===tk?" now":""}${k>tk?" later":""}" title="${d.toLocaleDateString("en-CA",{month:"short",day:"numeric"})}${f!=null?": "+fmt(f)+" ft":""}"><b>${d.getDate()}</b>${f!=null?`<span>${fmt(f)}</span>`:""}</li>`; }
+  return `<ol class="cal" aria-label="Daily results for the last five weeks"><li class="h">S</li><li class="h">M</li><li class="h">T</li><li class="h">W</li><li class="h">T</li><li class="h">F</li><li class="h">S</li>${h}</ol>`; }
+function boardHtml(rows){ if(!rows||!rows.length) return `<p class="credits">No scores yet today. Finish the daily and post yours.</p>`;
+  const me=store.get("c2c-name"), mine=stats.days&&stats.days[today()];
+  return `<ol class="lb">${rows.map((r,i)=>`<li class="${me&&r.name===me&&r.feet===mine?"me":""}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}</span><span class="gl">${r.goals} ${r.goals===1?"goal":"goals"}</span><span class="ft">${fmt(r.feet)} ft</span></li>`).join("")}</ol>`; }
+function openRecords(back){
+  const best=Object.entries(stats.bestBy||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div><dt>${esc(k==="daily"?"Daily":k==="free"?"Free skate":packName(k))}</dt><dd>${fmt(v)}</dd></div>`).join("");
+  openSheet("Records",`
+    ${NET.on()?`<section><p class="eyebrow">Today's daily leaderboard</p><div id="board"><p class="credits">Loading…</p></div></section>`:""}
+    <section><p class="eyebrow">Your numbers</p><dl class="stats"><div><dt>Played</dt><dd>${stats.played}</dd></div><div><dt>Best</dt><dd>${fmt(stats.best)}</dd></div><div><dt>Goals</dt><dd>${stats.goals}</dd></div><div><dt>Bar downs</dt><dd>${stats.bars||0}</dd></div></dl>
+      <dl class="stats"><div><dt>Streak</dt><dd>${stats.streak}</dd></div><div><dt>Best streak</dt><dd>${stats.maxStreak||stats.streak}</dd></div></dl></section>
+    ${best?`<section><p class="eyebrow">Best game by mode</p><dl class="stats wrap">${best}</dl></section>`:""}
+    <section><p class="eyebrow">Daily calendar</p>${calendarHtml()}</section>
+    <section><p class="eyebrow">Achievements · ${Object.keys(stats.ach||{}).length} of ${ACH.length}</p><ol class="achs">${ACH.map(([id,n,d])=>`<li class="${stats.ach&&stats.ach[id]?"got":""}"><b>${n}</b><span>${d}</span></li>`).join("")}</ol></section>`,back||"rec");
+  if(NET.on()) NET.board(today()).then(rows=>{ const el=$("board"); if(el) el.innerHTML=boardHtml(rows); }).catch(()=>{ const el=$("board"); if(el) el.innerHTML=`<p class="credits">Couldn't reach the leaderboard just now.</p>`; });
+}
+
+/* ---------- final screen ---------- */
+function shareText(){ const goals=state.results.filter(r=>r.feet>=GOAL_LINE).length;
+  const lines=state.results.map((r,k)=>{ const f=Math.round(r.feet/20); return `${k+1} ${"█".repeat(f)}${"░".repeat(10-f)} ${r.feet} ft${r.feet>=GOAL_LINE?" 🚨":""}`; });
+  return `${NAME} · ${modeLabel()}\n${fmt(total())} ft · ${goals} ${goals===1?"goal":"goals"}\n${lines.join("\n")}\n${SITE}`; }
+function copyText(txt,done,where){ const fb=$(where||"fb");
+  const fallback=()=>{ const b=$("sharebox"); if(!b) return; b.value=txt; b.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(e){} if(fb){ fb.textContent=ok?done:txt; if(!ok) fb.style.whiteSpace="pre-wrap"; } };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(()=>{ if(fb) fb.textContent=done; },fallback); else fallback(); }
+async function shareImage(){
+  const cnv=shareCanvas(false), fb=$("shfb")||$("fb");
+  const blob=await new Promise(res=>{ try{ cnv.toBlob(res,"image/png"); }catch(e){ res(null); } });
+  if(blob){
+    try{ const file=new File([blob],NAME.toLowerCase().replace(/[^a-z0-9]+/g,"-")+".png",{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file],text:`${fmt(total())} ft on ${NAME}. Can you beat it? ${SITE}`}); return; } }
+    catch(e){ if(e&&e.name==="AbortError") return; }
+    try{ if(navigator.clipboard&&window.ClipboardItem){ await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]); if(fb) fb.textContent="Picture copied. Paste it anywhere."; return; } }catch(e){}
+  }
+  let url=""; try{ url=cnv.toDataURL("image/png"); }catch(e){}
+  openSheet("Your result",`${url?`<img class="shot" src="${url}" alt="Your seven answers plotted on the rink, ${fmt(total())} feet in total.">`:""}<p class="credits">Press and hold the picture (or right-click it) to save or copy it.</p>`,"share");
+}
+function breakdownHtml(){
+  const bars=state.results.map((r,k)=>{ const set=setOf(state.picks[k]), a=r.i>=0?set.ans[r.i]:null, ti=tierOf(r.feet,r.pct||0);
+    return `<li class="t${ti.t}"><span class="lab">${esc(set.p.s)}</span><span class="ft">${r.feet} ft</span><span class="ans">${a?esc(a.name):(r.how==="pass"?"Passed":"Time's up")}</span><span class="track"><b style="width:${r.feet/2}%"></b></span></li>`; }).join("");
+  return `<ol class="bars">${bars}</ol>`; }
+async function sendChallenge(name){ const url=challengeUrl(name), text=`I went ${fmt(total())} ft on ${NAME}. Same seven prompts for you. Beat it:`;
+  try{ if(navigator.share){ await navigator.share({text,url}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
+  copyText(text+" "+url,"Challenge link copied. Paste it to a friend.","shfb"); }
+function openShare(){
+  openSheet("Share",`<section><p class="eyebrow">Challenge a friend</p><p class="credits">Send a link to the same seven prompts, with your ${fmt(total())} ft as the score to beat.</p>
+      <form class="post" id="chform" autocomplete="off"><label class="sr" for="chname">Your name, optional</label><input id="chname" type="text" maxlength="16" placeholder="Your name (optional)" value="${esc(store.get("c2c-name")||"")}" autocapitalize="words" spellcheck="false"><button class="go" type="submit">Send</button></form></section>
+    <section><p class="eyebrow">Show your result</p><div class="row"><button class="go wide ghost" id="shpic" type="button">Share picture</button><button class="go wide ghost" id="shtxt" type="button">Copy text</button></div></section>
+    <p class="fb" id="shfb" role="status" aria-live="polite"></p>`,"share");
+  $("chform").addEventListener("submit",e=>{ e.preventDefault(); const name=$("chname").value.trim().replace(/\s+/g," "), fb=$("shfb");
+    if(name&&(!NAME_OK.test(name)||RUDE.test(name))){ fb.className="fb bad"; fb.textContent="Use up to 16 letters, numbers or spaces."; return; }
+    fb.className="fb"; fb.textContent=""; if(name) store.set("c2c-name",name); sendChallenge(name); });
+  $("shpic").addEventListener("click",()=>{ $("shfb").className="fb"; shareImage(); });
+  $("shtxt").addEventListener("click",()=>{ $("shfb").className="fb"; copyText(shareText(),"Copied.","shfb"); });
+}
+let ticker=null;
+function viewDone(focus){
+  const t=total(), goals=state.results.filter(r=>r.feet>=GOAL_LINE).length, daily=state.mode==="daily", board=daily&&NET.on();
+  const got=(state.newAch||[]).map(id=>ACH.find(a=>a[0]===id)).filter(Boolean), ch=state.ch;
+  show(`<p class="eyebrow">${modeLabel()} · Final score</p>
+    <div class="finrow"><p class="final"><span id="fin">0</span><span class="u">FT</span></p><h2>${rating(t)}. ${goals} ${goals===1?"goal":"goals"}.</h2></div>
+    ${ch?`<p class="vs${t>ch.feet?" w":""}">${t>ch.feet?`You beat ${esc(ch.name||"your friend")} by ${fmt(t-ch.feet)} ft.`:t<ch.feet?`${esc(rival())} still has you by ${fmt(ch.feet-t)} ft.`:`Dead even with ${esc(ch.name||"your friend")} at ${fmt(t)} ft.`}</p>`:""}
+    ${got.length?`<p class="chips"><b>Unlocked</b>${got.map(a=>`<span title="${esc(a[2])}">${a[1]}</span>`).join("")}</p>`:""}
+    ${board&&!state.posted?`<form class="post" id="post" autocomplete="off"><label class="sr" for="lbname">Name for the leaderboard</label><input id="lbname" type="text" maxlength="16" placeholder="Name for the leaderboard" value="${esc(store.get("c2c-name")||"")}" autocapitalize="words" spellcheck="false"><button class="go" type="submit">Post</button></form>`:""}
+    <div class="row"><button class="go wide" id="again" type="button">${daily?"Play a free skate":"New game"}</button><button class="go wide ghost" id="share" type="button">Share</button></div>
+    <div class="under"><p class="fb" id="fb" role="status" aria-live="polite">${daily?'Next daily in <span id="count"></span>.':""}</p><span class="links"><button class="link" id="brk" type="button">Breakdown</button><button class="link" id="recs" type="button">${board?"Leaderboard":"Records"}</button></span></div>
+    <textarea class="sr" id="sharebox" readonly tabindex="-1" aria-hidden="true"></textarea>`);
+  puckReset(false);
+  recap={t0:performance.now()+350,items:recapItems()};
+  if(got.length&&!state.achShown){ state.achShown=true; save(); setTimeout(()=>SFX.ping(),900); }
+  const fin=$("fin"); if(REDUCED){ fin.textContent=fmt(t); } else { const t0=performance.now(); const step=n=>{ const p=Math.min(1,(n-t0)/1400); fin.textContent=fmt(Math.round(t*ease(p))); if(p<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+  $("brk").addEventListener("click",()=>openSheet("Breakdown",breakdownHtml(),"brk"));
+  $("recs").addEventListener("click",()=>openRecords("recs"));
+  $("share").addEventListener("click",openShare);
+  const post=$("post"); if(post) post.addEventListener("submit",e=>{ e.preventDefault(); const name=$("lbname").value.trim().replace(/\s+/g," "), fb=$("fb");
+    if(!NAME_OK.test(name)||RUDE.test(name)){ fb.className="fb bad"; fb.textContent="Use 1 to 16 letters, numbers or spaces."; return; }
+    store.set("c2c-name",name); fb.className="fb"; fb.textContent="Posting…";
+    NET.submit(state.key,name,t,goals).then(()=>{ state.posted=true; save(); post.remove(); resize(); fb.textContent="Posted."; openRecords("recs"); }).catch(()=>{ fb.className="fb bad"; fb.textContent="Couldn't post just now. Try again in a minute."; }); });
+  $("again").addEventListener("click",()=>{ SFX.unlock(); state=state.mode==="pack"?fresh("pack",state.pack):fresh("free"); begin(); });
+  clearInterval(ticker);
+  if(daily){ const tick=()=>{ const el=$("count"); if(!el) return clearInterval(ticker); const n=new Date(), m=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1); let s=Math.max(0,Math.floor((m-n)/1000)); const h=Math.floor(s/3600); s-=h*3600; const mi=Math.floor(s/60); s-=mi*60; el.textContent=`${h}h ${String(mi).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`; }; tick(); ticker=setInterval(tick,1000); }
+  if(focus) $("again").focus({preventScroll:true});
+}
+let lastView="";
+function render(focus){ $("sheet").hidden=true; loadCrowd(); drawHud(); const v=state.view; if(v==="intro") viewIntro(focus); else if(v==="ask") viewAsk(focus); else if(v==="result") viewResult(false,focus); else viewDone(focus); drawHud();
+  if((v==="done")!==(lastView==="done")||v==="done") resize(); lastView=state.view; }
+function switchMode(mode){ if(mode==="pack"){ if(state.mode!=="pack"){ const s=loadMode("pack"); if(s){ state=s; save(); render(false); return; } } return openPacks(); }
+  if(state.mode===mode) return; state=loadMode(mode); save(); render(false); }
+
+/* ================= boot ================= */
+for(const m of ["daily","free","pack"]) $("m-"+m).addEventListener("click",()=>switchMode(m));
+$("snd").addEventListener("click",()=>{ SFX.toggle(); drawSnd(); if(SFX.on) SFX.tap(); });
+$("rec").addEventListener("click",()=>openRecords("rec"));
+$("sheetx").addEventListener("click",closeSheet);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeSheet(); });
+{ const m=store.get(K_MODE); state=(m==="pack"&&loadMode("pack"))||loadMode(m==="free"?"free":"daily"); }
+const linked=readChallenge(); if(linked&&!linked.bad) takeChallenge(linked);
+drawSnd(); resize(); render(false);
+if(linked&&linked.bad){ const fb=document.createElement("p"); fb.className="small"; fb.textContent="That challenge link is out of date, so here's today's game instead."; card.appendChild(fb); }
+if(!store.get(K_SEEN)){ if(stats.played) store.set(K_SEEN,1); else if(state.view==="intro") openHow("start"); }
+try{ document.fonts.load('italic 700 15px "Barlow Condensed"'); }catch(e){}
+window.addEventListener("resize",resize);
+if(window.ResizeObserver) new ResizeObserver(resize).observe(app);
+requestAnimationFrame(loop);
+</script>

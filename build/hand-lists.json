@@ -1,0 +1,1072 @@
+{
+ "cs": [
+  {
+   "name": "Sidney Crosby",
+   "detail": "2016, 2017"
+  },
+  {
+   "name": "Connor McDavid",
+   "detail": "2024"
+  },
+  {
+   "name": "Wayne Gretzky",
+   "detail": "1985, 1988"
+  },
+  {
+   "name": "Mario Lemieux",
+   "detail": "1991, 1992"
+  },
+  {
+   "name": "Patrick Roy",
+   "detail": "1986, 1993, 2001"
+  },
+  {
+   "name": "Alexander Ovechkin",
+   "detail": "2018"
+  },
+  {
+   "name": "Cale Makar",
+   "detail": "2022"
+  },
+  {
+   "name": "Bobby Orr",
+   "detail": "1970, 1972"
+  },
+  {
+   "name": "Patrick Kane",
+   "detail": "2013"
+  },
+  {
+   "name": "Sam Bennett",
+   "detail": "2025"
+  },
+  {
+   "name": "Jordan Staal",
+   "detail": "2026"
+  },
+  {
+   "name": "Andrei Vasilevskiy",
+   "detail": "2021"
+  },
+  {
+   "name": "Evgeni Malkin",
+   "detail": "2009"
+  },
+  {
+   "name": "Jonathan Toews",
+   "detail": "2010"
+  },
+  {
+   "name": "Mark Messier",
+   "detail": "1984"
+  },
+  {
+   "name": "Steve Yzerman",
+   "detail": "1998"
+  },
+  {
+   "name": "Joe Sakic",
+   "detail": "1996"
+  },
+  {
+   "name": "Victor Hedman",
+   "detail": "2020"
+  },
+  {
+   "name": "Jonathan Marchessault",
+   "detail": "2023"
+  },
+  {
+   "name": "Jonathan Quick",
+   "detail": "2012"
+  },
+  {
+   "name": "Tim Thomas",
+   "detail": "2011"
+  },
+  {
+   "name": "Ryan O'Reilly",
+   "detail": "2019"
+  },
+  {
+   "name": "Nicklas Lidstrom",
+   "detail": "2002"
+  },
+  {
+   "name": "Ken Dryden",
+   "detail": "1971"
+  },
+  {
+   "name": "Duncan Keith",
+   "detail": "2015"
+  },
+  {
+   "name": "Jean-Sebastien Giguere",
+   "detail": "2003"
+  },
+  {
+   "name": "Henrik Zetterberg",
+   "detail": "2008"
+  },
+  {
+   "name": "Guy Lafleur",
+   "detail": "1977"
+  },
+  {
+   "name": "Ron Hextall",
+   "detail": "1987"
+  },
+  {
+   "name": "Jean Beliveau",
+   "detail": "1965"
+  },
+  {
+   "name": "Mike Bossy",
+   "detail": "1982"
+  },
+  {
+   "name": "Brian Leetch",
+   "detail": "1994"
+  },
+  {
+   "name": "Justin Williams",
+   "detail": "2014"
+  },
+  {
+   "name": "Cam Ward",
+   "detail": "2006"
+  },
+  {
+   "name": "Scott Niedermayer",
+   "detail": "2007"
+  },
+  {
+   "name": "Scott Stevens",
+   "detail": "2000"
+  },
+  {
+   "name": "Brad Richards",
+   "detail": "2004"
+  },
+  {
+   "name": "Bernie Parent",
+   "detail": "1974, 1975"
+  },
+  {
+   "name": "Bryan Trottier",
+   "detail": "1980"
+  },
+  {
+   "name": "Claude Lemieux",
+   "detail": "1995"
+  },
+  {
+   "name": "Al MacInnis",
+   "detail": "1989"
+  },
+  {
+   "name": "Larry Robinson",
+   "detail": "1978"
+  },
+  {
+   "name": "Billy Smith",
+   "detail": "1983"
+  },
+  {
+   "name": "Joe Nieuwendyk",
+   "detail": "1999"
+  },
+  {
+   "name": "Mike Vernon",
+   "detail": "1997"
+  },
+  {
+   "name": "Dave Keon",
+   "detail": "1967"
+  },
+  {
+   "name": "Glenn Hall",
+   "detail": "1968"
+  },
+  {
+   "name": "Bob Gainey",
+   "detail": "1979"
+  },
+  {
+   "name": "Bill Ranford",
+   "detail": "1990"
+  },
+  {
+   "name": "Yvan Cournoyer",
+   "detail": "1973"
+  },
+  {
+   "name": "Serge Savard",
+   "detail": "1969"
+  },
+  {
+   "name": "Reggie Leach",
+   "detail": "1976"
+  },
+  {
+   "name": "Butch Goring",
+   "detail": "1981"
+  },
+  {
+   "name": "Roger Crozier",
+   "detail": "1966"
+  }
+ ],
+ "fo": [
+  {
+   "name": "Connor McDavid",
+   "detail": "2015 · Edmonton Oilers"
+  },
+  {
+   "name": "Sidney Crosby",
+   "detail": "2005 · Pittsburgh Penguins"
+  },
+  {
+   "name": "Alexander Ovechkin",
+   "detail": "2004 · Washington Capitals"
+  },
+  {
+   "name": "Auston Matthews",
+   "detail": "2016 · Toronto Maple Leafs"
+  },
+  {
+   "name": "Mario Lemieux",
+   "detail": "1984 · Pittsburgh Penguins"
+  },
+  {
+   "name": "Nathan MacKinnon",
+   "detail": "2013 · Colorado Avalanche"
+  },
+  {
+   "name": "Connor Bedard",
+   "detail": "2023 · Chicago Blackhawks"
+  },
+  {
+   "name": "Macklin Celebrini",
+   "detail": "2024 · San Jose Sharks"
+  },
+  {
+   "name": "Gavin McKenna",
+   "detail": "2026 · Toronto Maple Leafs"
+  },
+  {
+   "name": "Patrick Kane",
+   "detail": "2007 · Chicago Blackhawks"
+  },
+  {
+   "name": "Steven Stamkos",
+   "detail": "2008 · Tampa Bay Lightning"
+  },
+  {
+   "name": "John Tavares",
+   "detail": "2009 · New York Islanders"
+  },
+  {
+   "name": "Matthew Schaefer",
+   "detail": "2025 · New York Islanders"
+  },
+  {
+   "name": "Jack Hughes",
+   "detail": "2019 · New Jersey Devils"
+  },
+  {
+   "name": "Guy Lafleur",
+   "detail": "1971 · Montreal Canadiens"
+  },
+  {
+   "name": "Eric Lindros",
+   "detail": "1991 · Quebec Nordiques"
+  },
+  {
+   "name": "Marc-Andre Fleury",
+   "detail": "2003 · Pittsburgh Penguins"
+  },
+  {
+   "name": "Mats Sundin",
+   "detail": "1989 · Quebec Nordiques"
+  },
+  {
+   "name": "Joe Thornton",
+   "detail": "1997 · Boston Bruins"
+  },
+  {
+   "name": "Rasmus Dahlin",
+   "detail": "2018 · Buffalo Sabres"
+  },
+  {
+   "name": "Taylor Hall",
+   "detail": "2010 · Edmonton Oilers"
+  },
+  {
+   "name": "Ryan Nugent-Hopkins",
+   "detail": "2011 · Edmonton Oilers"
+  },
+  {
+   "name": "Juraj Slafkovsky",
+   "detail": "2022 · Montreal Canadiens"
+  },
+  {
+   "name": "Alexis Lafreniere",
+   "detail": "2020 · New York Rangers"
+  },
+  {
+   "name": "Nico Hischier",
+   "detail": "2017 · New Jersey Devils"
+  },
+  {
+   "name": "Aaron Ekblad",
+   "detail": "2014 · Florida Panthers"
+  },
+  {
+   "name": "Owen Power",
+   "detail": "2021 · Buffalo Sabres"
+  },
+  {
+   "name": "Nail Yakupov",
+   "detail": "2012 · Edmonton Oilers"
+  },
+  {
+   "name": "Wendel Clark",
+   "detail": "1985 · Toronto Maple Leafs"
+  },
+  {
+   "name": "Mike Modano",
+   "detail": "1988 · Minnesota North Stars"
+  },
+  {
+   "name": "Ilya Kovalchuk",
+   "detail": "2001 · Atlanta Thrashers"
+  },
+  {
+   "name": "Rick Nash",
+   "detail": "2002 · Columbus Blue Jackets"
+  },
+  {
+   "name": "Vincent Lecavalier",
+   "detail": "1998 · Tampa Bay Lightning"
+  },
+  {
+   "name": "Alexandre Daigle",
+   "detail": "1993 · Ottawa Senators"
+  },
+  {
+   "name": "Patrik Stefan",
+   "detail": "1999 · Atlanta Thrashers"
+  },
+  {
+   "name": "Rick DiPietro",
+   "detail": "2000 · New York Islanders"
+  },
+  {
+   "name": "Denis Potvin",
+   "detail": "1973 · New York Islanders"
+  },
+  {
+   "name": "Gilbert Perreault",
+   "detail": "1970 · Buffalo Sabres"
+  },
+  {
+   "name": "Dale Hawerchuk",
+   "detail": "1981 · Winnipeg Jets"
+  },
+  {
+   "name": "Erik Johnson",
+   "detail": "2006 · St. Louis Blues"
+  },
+  {
+   "name": "Pierre Turgeon",
+   "detail": "1987 · Buffalo Sabres"
+  },
+  {
+   "name": "Owen Nolan",
+   "detail": "1990 · Quebec Nordiques"
+  },
+  {
+   "name": "Ed Jovanovski",
+   "detail": "1994 · Florida Panthers"
+  },
+  {
+   "name": "Roman Hamrlik",
+   "detail": "1992 · Tampa Bay Lightning"
+  },
+  {
+   "name": "Chris Phillips",
+   "detail": "1996 · Ottawa Senators"
+  },
+  {
+   "name": "Bryan Berard",
+   "detail": "1995 · Ottawa Senators"
+  },
+  {
+   "name": "Rob Ramage",
+   "detail": "1979 · Colorado Rockies"
+  },
+  {
+   "name": "Bobby Smith",
+   "detail": "1978 · Minnesota North Stars"
+  },
+  {
+   "name": "Joe Murphy",
+   "detail": "1986 · Detroit Red Wings"
+  },
+  {
+   "name": "Brian Lawton",
+   "detail": "1983 · Minnesota North Stars"
+  },
+  {
+   "name": "Doug Wickenheiser",
+   "detail": "1980 · Montreal Canadiens"
+  },
+  {
+   "name": "Dale McCourt",
+   "detail": "1977 · Detroit Red Wings"
+  },
+  {
+   "name": "Mel Bridgman",
+   "detail": "1975 · Philadelphia Flyers"
+  },
+  {
+   "name": "Rick Green",
+   "detail": "1976 · Washington Capitals"
+  },
+  {
+   "name": "Greg Joly",
+   "detail": "1974 · Washington Capitals"
+  },
+  {
+   "name": "Gord Kluzak",
+   "detail": "1982 · Boston Bruins"
+  },
+  {
+   "name": "Billy Harris",
+   "detail": "1972 · New York Islanders"
+  },
+  {
+   "name": "Rejean Houle",
+   "detail": "1969 · Montreal Canadiens"
+  },
+  {
+   "name": "Michel Plasse",
+   "detail": "1968 · Montreal Canadiens"
+  },
+  {
+   "name": "Garry Monahan",
+   "detail": "1963 · Montreal Canadiens"
+  },
+  {
+   "name": "Barry Gibbs",
+   "detail": "1966 · Boston Bruins"
+  },
+  {
+   "name": "Rick Pagnutti",
+   "detail": "1967 · Los Angeles Kings"
+  },
+  {
+   "name": "Claude Gauthier",
+   "detail": "1964 · Detroit Red Wings"
+  },
+  {
+   "name": "Andre Veilleux",
+   "detail": "1965 · New York Rangers"
+  }
+ ],
+ "cap": [
+  {
+   "name": "Auston Matthews",
+   "detail": "2024 to present"
+  },
+  {
+   "name": "John Tavares",
+   "detail": "2019–24"
+  },
+  {
+   "name": "Mats Sundin",
+   "detail": "1997–2008"
+  },
+  {
+   "name": "Doug Gilmour",
+   "detail": "1994–97"
+  },
+  {
+   "name": "Wendel Clark",
+   "detail": "1991–94"
+  },
+  {
+   "name": "Darryl Sittler",
+   "detail": "1975–81"
+  },
+  {
+   "name": "Dion Phaneuf",
+   "detail": "2010–16"
+  },
+  {
+   "name": "Dave Keon",
+   "detail": "1969–75"
+  },
+  {
+   "name": "George Armstrong",
+   "detail": "1958–69"
+  },
+  {
+   "name": "Ted Kennedy",
+   "detail": "1948–55, 1957"
+  },
+  {
+   "name": "Syl Apps",
+   "detail": "1940–43, 1945–48"
+  },
+  {
+   "name": "Rick Vaive",
+   "detail": "1982–86"
+  },
+  {
+   "name": "Hap Day",
+   "detail": "1927–37"
+  },
+  {
+   "name": "Charlie Conacher",
+   "detail": "1937–38"
+  },
+  {
+   "name": "Rob Ramage",
+   "detail": "1989–91"
+  },
+  {
+   "name": "Red Horner",
+   "detail": "1938–40"
+  },
+  {
+   "name": "Sid Smith",
+   "detail": "1955–56"
+  },
+  {
+   "name": "Jimmy Thomson",
+   "detail": "1956–57"
+  },
+  {
+   "name": "Bob Davidson",
+   "detail": "1943–45"
+  },
+  {
+   "name": "Bert Corbeau",
+   "detail": "Captain when the St. Pats became the Leafs in 1927"
+  }
+ ],
+ "calder": [
+  {
+   "name": "Alexander Ovechkin",
+   "detail": "2006"
+  },
+  {
+   "name": "Auston Matthews",
+   "detail": "2017"
+  },
+  {
+   "name": "Connor Bedard",
+   "detail": "2024"
+  },
+  {
+   "name": "Cale Makar",
+   "detail": "2020"
+  },
+  {
+   "name": "Mario Lemieux",
+   "detail": "1985"
+  },
+  {
+   "name": "Bobby Orr",
+   "detail": "1967"
+  },
+  {
+   "name": "Patrick Kane",
+   "detail": "2008"
+  },
+  {
+   "name": "Nathan MacKinnon",
+   "detail": "2014"
+  },
+  {
+   "name": "Matthew Schaefer",
+   "detail": "2026"
+  },
+  {
+   "name": "Lane Hutson",
+   "detail": "2025"
+  },
+  {
+   "name": "Evgeni Malkin",
+   "detail": "2007"
+  },
+  {
+   "name": "Kirill Kaprizov",
+   "detail": "2021"
+  },
+  {
+   "name": "Martin Brodeur",
+   "detail": "1994"
+  },
+  {
+   "name": "Teemu Selanne",
+   "detail": "1993"
+  },
+  {
+   "name": "Pavel Bure",
+   "detail": "1992"
+  },
+  {
+   "name": "Peter Forsberg",
+   "detail": "1995"
+  },
+  {
+   "name": "Ray Bourque",
+   "detail": "1980"
+  },
+  {
+   "name": "Artemi Panarin",
+   "detail": "2016"
+  },
+  {
+   "name": "Elias Pettersson",
+   "detail": "2019"
+  },
+  {
+   "name": "Mathew Barzal",
+   "detail": "2018"
+  },
+  {
+   "name": "Moritz Seider",
+   "detail": "2022"
+  },
+  {
+   "name": "Matty Beniers",
+   "detail": "2023"
+  },
+  {
+   "name": "Gabriel Landeskog",
+   "detail": "2012"
+  },
+  {
+   "name": "Jonathan Huberdeau",
+   "detail": "2013"
+  },
+  {
+   "name": "Aaron Ekblad",
+   "detail": "2015"
+  },
+  {
+   "name": "Jeff Skinner",
+   "detail": "2011"
+  },
+  {
+   "name": "Daniel Alfredsson",
+   "detail": "1996"
+  },
+  {
+   "name": "Ken Dryden",
+   "detail": "1972"
+  },
+  {
+   "name": "Mike Bossy",
+   "detail": "1978"
+  },
+  {
+   "name": "Terry Sawchuk",
+   "detail": "1951"
+  },
+  {
+   "name": "Bryan Trottier",
+   "detail": "1976"
+  },
+  {
+   "name": "Denis Potvin",
+   "detail": "1974"
+  },
+  {
+   "name": "Brian Leetch",
+   "detail": "1989"
+  },
+  {
+   "name": "Luc Robitaille",
+   "detail": "1987"
+  },
+  {
+   "name": "Ed Belfour",
+   "detail": "1991"
+  },
+  {
+   "name": "Tony Esposito",
+   "detail": "1970"
+  },
+  {
+   "name": "Joe Nieuwendyk",
+   "detail": "1988"
+  },
+  {
+   "name": "Tyler Myers",
+   "detail": "2010"
+  },
+  {
+   "name": "Steve Mason",
+   "detail": "2009"
+  },
+  {
+   "name": "Dany Heatley",
+   "detail": "2002"
+  },
+  {
+   "name": "Andrew Raycroft",
+   "detail": "2004"
+  },
+  {
+   "name": "Scott Gomez",
+   "detail": "2000"
+  },
+  {
+   "name": "Chris Drury",
+   "detail": "1999"
+  },
+  {
+   "name": "Sergei Samsonov",
+   "detail": "1998"
+  },
+  {
+   "name": "Evgeni Nabokov",
+   "detail": "2001"
+  },
+  {
+   "name": "Barret Jackman",
+   "detail": "2003"
+  },
+  {
+   "name": "Bryan Berard",
+   "detail": "1997"
+  },
+  {
+   "name": "Sergei Makarov",
+   "detail": "1990"
+  },
+  {
+   "name": "Dale Hawerchuk",
+   "detail": "1982"
+  },
+  {
+   "name": "Peter Stastny",
+   "detail": "1981"
+  },
+  {
+   "name": "Gilbert Perreault",
+   "detail": "1971"
+  },
+  {
+   "name": "Dave Keon",
+   "detail": "1961"
+  },
+  {
+   "name": "Frank Mahovlich",
+   "detail": "1958"
+  },
+  {
+   "name": "Glenn Hall",
+   "detail": "1956"
+  },
+  {
+   "name": "Bernie Geoffrion",
+   "detail": "1952"
+  },
+  {
+   "name": "Tom Barrasso",
+   "detail": "1984"
+  },
+  {
+   "name": "Syl Apps",
+   "detail": "1937"
+  },
+  {
+   "name": "Steve Larmer",
+   "detail": "1983"
+  },
+  {
+   "name": "Gary Suter",
+   "detail": "1986"
+  },
+  {
+   "name": "Derek Sanderson",
+   "detail": "1968"
+  },
+  {
+   "name": "Gump Worsley",
+   "detail": "1953"
+  },
+  {
+   "name": "Bobby Smith",
+   "detail": "1979"
+  },
+  {
+   "name": "Howie Meeker",
+   "detail": "1947"
+  },
+  {
+   "name": "Jacques Laperriere",
+   "detail": "1964"
+  },
+  {
+   "name": "Frank Brimsek",
+   "detail": "1939"
+  },
+  {
+   "name": "Sweeney Schriner",
+   "detail": "1935"
+  },
+  {
+   "name": "Roger Crozier",
+   "detail": "1965"
+  },
+  {
+   "name": "Willi Plett",
+   "detail": "1977"
+  },
+  {
+   "name": "Steve Vickers",
+   "detail": "1973"
+  },
+  {
+   "name": "Eric Vail",
+   "detail": "1975"
+  },
+  {
+   "name": "Danny Grant",
+   "detail": "1969"
+  },
+  {
+   "name": "Brit Selby",
+   "detail": "1966"
+  },
+  {
+   "name": "Kent Douglas",
+   "detail": "1963"
+  },
+  {
+   "name": "Bobby Rousseau",
+   "detail": "1962"
+  },
+  {
+   "name": "Bill Hay",
+   "detail": "1960"
+  },
+  {
+   "name": "Ralph Backstrom",
+   "detail": "1959"
+  },
+  {
+   "name": "Larry Regan",
+   "detail": "1957"
+  },
+  {
+   "name": "Ed Litzenberger",
+   "detail": "1955"
+  },
+  {
+   "name": "Camille Henry",
+   "detail": "1954"
+  },
+  {
+   "name": "Jack Gelineau",
+   "detail": "1950"
+  },
+  {
+   "name": "Pentti Lund",
+   "detail": "1949"
+  },
+  {
+   "name": "Jim McFadden",
+   "detail": "1948"
+  },
+  {
+   "name": "Edgar Laprade",
+   "detail": "1946"
+  },
+  {
+   "name": "Frank McCool",
+   "detail": "1945"
+  },
+  {
+   "name": "Gus Bodnar",
+   "detail": "1944"
+  },
+  {
+   "name": "Gaye Stewart",
+   "detail": "1943"
+  },
+  {
+   "name": "Grant Warwick",
+   "detail": "1942"
+  },
+  {
+   "name": "Johnny Quilty",
+   "detail": "1941"
+  },
+  {
+   "name": "Kilby MacDonald",
+   "detail": "1940"
+  },
+  {
+   "name": "Cully Dahlstrom",
+   "detail": "1938"
+  },
+  {
+   "name": "Mike Karakas",
+   "detail": "1936"
+  },
+  {
+   "name": "Russ Blinco",
+   "detail": "1934"
+  },
+  {
+   "name": "Carl Voss",
+   "detail": "1933"
+  }
+ ],
+ "norris": [
+  {
+   "name": "Cale Makar",
+   "detail": "2022, 2025"
+  },
+  {
+   "name": "Bobby Orr",
+   "detail": "1968–75"
+  },
+  {
+   "name": "Nicklas Lidstrom",
+   "detail": "2001–03, 2006–08, 2011"
+  },
+  {
+   "name": "Erik Karlsson",
+   "detail": "2012, 2015, 2023"
+  },
+  {
+   "name": "Quinn Hughes",
+   "detail": "2024"
+  },
+  {
+   "name": "Zach Werenski",
+   "detail": "2026"
+  },
+  {
+   "name": "Ray Bourque",
+   "detail": "1987, 1988, 1990, 1991, 1994"
+  },
+  {
+   "name": "Victor Hedman",
+   "detail": "2018"
+  },
+  {
+   "name": "Adam Fox",
+   "detail": "2021"
+  },
+  {
+   "name": "Roman Josi",
+   "detail": "2020"
+  },
+  {
+   "name": "Paul Coffey",
+   "detail": "1985, 1986, 1995"
+  },
+  {
+   "name": "Drew Doughty",
+   "detail": "2016"
+  },
+  {
+   "name": "Zdeno Chara",
+   "detail": "2009"
+  },
+  {
+   "name": "P. K. Subban",
+   "detail": "2013"
+  },
+  {
+   "name": "Brent Burns",
+   "detail": "2017"
+  },
+  {
+   "name": "Duncan Keith",
+   "detail": "2010, 2014"
+  },
+  {
+   "name": "Chris Chelios",
+   "detail": "1989, 1993, 1996"
+  },
+  {
+   "name": "Chris Pronger",
+   "detail": "2000"
+  },
+  {
+   "name": "Denis Potvin",
+   "detail": "1976, 1978, 1979"
+  },
+  {
+   "name": "Brian Leetch",
+   "detail": "1992, 1997"
+  },
+  {
+   "name": "Scott Niedermayer",
+   "detail": "2004"
+  },
+  {
+   "name": "Mark Giordano",
+   "detail": "2019"
+  },
+  {
+   "name": "Al MacInnis",
+   "detail": "1999"
+  },
+  {
+   "name": "Larry Robinson",
+   "detail": "1977, 1980"
+  },
+  {
+   "name": "Doug Harvey",
+   "detail": "1955–58, 1960–62"
+  },
+  {
+   "name": "Rob Blake",
+   "detail": "1998"
+  },
+  {
+   "name": "Rod Langway",
+   "detail": "1983, 1984"
+  },
+  {
+   "name": "Red Kelly",
+   "detail": "1954"
+  },
+  {
+   "name": "Randy Carlyle",
+   "detail": "1981"
+  },
+  {
+   "name": "Doug Wilson",
+   "detail": "1982"
+  },
+  {
+   "name": "Pierre Pilote",
+   "detail": "1963–65"
+  },
+  {
+   "name": "Jacques Laperriere",
+   "detail": "1966"
+  },
+  {
+   "name": "Harry Howell",
+   "detail": "1967"
+  },
+  {
+   "name": "Tom Johnson",
+   "detail": "1959"
+  }
+ ]
+}

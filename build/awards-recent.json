@@ -1,0 +1,74 @@
+{
+  "_note": "Hand-kept winners for seasons the Hockey Databank does not cover (2018-19 onward). Keys are the year the season STARTED: 2025 means 2025-26, awards handed out in June 2026. Hall of Fame keys are the induction class year. Add a line each summer.",
+  "awards": {
+    "Hart": {
+      "2018": "Nikita Kucherov",
+      "2019": "Leon Draisaitl",
+      "2020": "Connor McDavid",
+      "2021": "Auston Matthews",
+      "2022": "Connor McDavid",
+      "2023": "Nathan MacKinnon",
+      "2024": "Connor Hellebuyck",
+      "2025": "Nikita Kucherov"
+    },
+    "Vezina": {
+      "2018": "Andrei Vasilevskiy",
+      "2019": "Connor Hellebuyck",
+      "2020": "Marc-Andre Fleury",
+      "2021": "Igor Shesterkin",
+      "2022": "Linus Ullmark",
+      "2023": "Connor Hellebuyck",
+      "2024": "Connor Hellebuyck",
+      "2025": "Andrei Vasilevskiy"
+    },
+    "Selke": {
+      "2018": "Ryan O'Reilly",
+      "2019": "Sean Couturier",
+      "2020": "Aleksander Barkov",
+      "2021": "Patrice Bergeron",
+      "2022": "Patrice Bergeron",
+      "2023": "Aleksander Barkov",
+      "2024": "Aleksander Barkov",
+      "2025": "Nick Suzuki"
+    },
+    "Lady Byng": {
+      "2018": "Aleksander Barkov",
+      "2019": "Nathan MacKinnon",
+      "2020": "Jaccob Slavin",
+      "2021": "Kyle Connor",
+      "2022": "Anze Kopitar",
+      "2023": "Jaccob Slavin",
+      "2024": "Anze Kopitar",
+      "2025": "Cole Caufield"
+    },
+    "Lindsay": {
+      "2018": "Nikita Kucherov",
+      "2019": "Leon Draisaitl",
+      "2020": "Connor McDavid",
+      "2021": "Auston Matthews",
+      "2022": "Connor McDavid",
+      "2023": "Nathan MacKinnon",
+      "2024": "Nikita Kucherov",
+      "2025": "Connor McDavid"
+    },
+    "First Team All-Star": {
+      "2018": "G:Andrei Vasilevskiy|D:Brent Burns|D:John Carlson|C:Connor McDavid|RW:Nikita Kucherov|LW:Alex Ovechkin",
+      "2019": "G:Connor Hellebuyck|D:John Carlson|D:Roman Josi|C:Leon Draisaitl|RW:David Pastrnak|LW:Artemi Panarin",
+      "2020": "G:Andrei Vasilevskiy|D:Adam Fox|D:Cale Makar|C:Connor McDavid|RW:Mitch Marner|LW:Brad Marchand",
+      "2021": "G:Igor Shesterkin|D:Roman Josi|D:Cale Makar|C:Auston Matthews|RW:Mitch Marner|LW:Johnny Gaudreau",
+      "2022": "G:Linus Ullmark|D:Adam Fox|D:Erik Karlsson|C:Connor McDavid|RW:David Pastrnak|LW:Jason Robertson",
+      "2023": "G:Connor Hellebuyck|D:Quinn Hughes|D:Roman Josi|C:Nathan MacKinnon|RW:Nikita Kucherov|LW:Artemi Panarin",
+      "2024": "G:Connor Hellebuyck|D:Cale Makar|D:Zach Werenski|C:Nathan MacKinnon|RW:Nikita Kucherov|LW:Kyle Connor",
+      "2025": "G:Andrei Vasilevskiy|D:Cale Makar|D:Zach Werenski|C:Connor McDavid|RW:Nikita Kucherov|LW:Jason Robertson"
+    }
+  },
+  "hallOfFame": {
+    "2019": ["Guy Carbonneau", "Vaclav Nedomansky", "Hayley Wickenheiser", "Sergei Zubov"],
+    "2020": ["Marian Hossa", "Jarome Iginla", "Kevin Lowe", "Kim St-Pierre", "Doug Wilson"],
+    "2022": ["Daniel Alfredsson", "Roberto Luongo", "Riikka Sallinen", "Daniel Sedin", "Henrik Sedin"],
+    "2023": ["Tom Barrasso", "Henrik Lundqvist", "Caroline Ouellette", "Pierre Turgeon", "Mike Vernon"],
+    "2024": ["Natalie Darwitz", "Pavel Datsyuk", "Jeremy Roenick", "Shea Weber", "Krissy Wendell-Pohl"],
+    "2025": ["Jennifer Botterill", "Zdeno Chara", "Brianna Decker", "Duncan Keith", "Alexander Mogilny", "Joe Thornton"],
+    "2026": ["Patrice Bergeron", "Cindy Curley", "Carey Price", "Pekka Rinne", "Keith Tkachuk"]
+  }
+}
