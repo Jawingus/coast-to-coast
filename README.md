@@ -2,6 +2,12 @@
 
 An NHL trivia game where the rarest answer wins. Seven prompts, a clock on each, and the more obscure your answer, the further you carry the puck up the ice.
 
-The whole game is `index.html`. Open it in a browser, or host it on any static host.
+Play it: https://jawingus.github.io/coast-to-coast/
+
+## What's in here
+
+- `index.html` is the whole game: prompts, answers, graphics and sound in one file.
+- `og.jpg` is the picture shown when the link is shared.
+- `database-setup.sql` is the one-time setup script for the online database (Supabase) that stores guess counts and the daily leaderboard.
 
 An unofficial fan project. Not affiliated with or endorsed by the NHL or its teams. Data credits are inside the game under "Data and credits".
