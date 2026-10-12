@@ -402,3 +402,5 @@
 8483768 | 20242025 | Vancouver Canucks | 16 | 1 | 2 | 8
 8476905 | 20192020 | Vegas Golden Knights | 41 | 8 | 14 | 10
 8477511 | 20202021 | Detroit Red Wings | 42 | 11 | 10 | 17
+8476312 | 20212022 | Anaheim Ducks | 45 | 4 | 5 | 53
+8476312 | 20212022 | Colorado Avalanche | 22 | 2 | 5 | 12
