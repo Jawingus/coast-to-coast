@@ -404,3 +404,5 @@
 8477511 | 20202021 | Detroit Red Wings | 42 | 11 | 10 | 17
 8476312 | 20212022 | Anaheim Ducks | 45 | 4 | 5 | 53
 8476312 | 20212022 | Colorado Avalanche | 22 | 2 | 5 | 12
+8479542 | 20212022 | Chicago Blackhawks | 55 | 21 | 16 | 23
+8479542 | 20212022 | Tampa Bay Lightning | 22 | 4 | 3 | 8
