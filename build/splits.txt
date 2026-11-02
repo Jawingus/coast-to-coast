@@ -406,3 +406,11 @@
 8476312 | 20212022 | Colorado Avalanche | 22 | 2 | 5 | 12
 8479542 | 20212022 | Chicago Blackhawks | 55 | 21 | 16 | 23
 8479542 | 20212022 | Tampa Bay Lightning | 22 | 4 | 3 | 8
+8474567 | 20232024 | Tampa Bay Lightning | 4 | 0 | 0 | 0
+8474567 | 20232024 | Minnesota Wild | 61 | 3 | 11 | 63
+8474568 | 20252026 | Winnipeg Jets | 46 | 1 | 6 | 32
+8474568 | 20252026 | Buffalo Sabres | 4 | 0 | 0 | 11
+8476871 | 20252026 | Winnipeg Jets | 52 | 7 | 6 | 25
+8476871 | 20252026 | Buffalo Sabres | 4 | 0 | 2 | 2
+8480196 | 20252026 | Buffalo Sabres | 35 | 2 | 3 | 8
+8480196 | 20252026 | Winnipeg Jets | 15 | 0 | 3 | 2
